@@ -25,12 +25,13 @@ SECRET_KEY = 'django-insecure-hbetbnyfrfe@*cyb^i5#m08sbpxcby6-_9b(c--3inju^neiu1
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["192.168.17.32","0.0.0.0"]
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    # "simpleui",
     "polls.apps.PollsConfig",
     "casePlan.apps.CaseplanConfig",
     'django.contrib.admin',
@@ -76,18 +77,28 @@ WSGI_APPLICATION = 'interface_test_platform.wsgi.application'
 # Database 默认配置
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
+# settings.py
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'OPTIONS': {
+            'read_default_file':BASE_DIR / 'config/my.cnf'
+        },
     }
 }
 
-# Database mongo默认配置
-
-DB_NAME = 'case_platform_db'
-DB_HOST = '1.116.254.250:27017'
-mongoengine.connect(db=DB_NAME,host=DB_HOST)
+# # Database mongo默认配置
+#
+# DB_NAME = 'case_platform_db'
+# DB_HOST = '1.116.254.250:27017'
+# mongoengine.connect(db=DB_NAME,host=DB_HOST)
 
 
 # Password validation
