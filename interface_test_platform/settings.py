@@ -31,7 +31,7 @@ ALLOWED_HOSTS = ["192.168.17.32","0.0.0.0"]
 # Application definition
 
 INSTALLED_APPS = [
-    # "simpleui",
+    "import_export",
     "polls.apps.PollsConfig",
     "casePlan.apps.CaseplanConfig",
     'django.contrib.admin',

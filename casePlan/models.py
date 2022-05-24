@@ -19,10 +19,11 @@ class variableModel(models.Model):
 
 
     name = models.CharField(max_length=500, default=None, blank=False)  # 变量名称
-
-    variable = models.ForeignKey("planModel",on_delete=models.CASCADE,default=None,blank=True)
+    plan = models.ForeignKey("planModel",on_delete=models.CASCADE,default=None,blank=True)
     value = models.CharField(max_length=500, default="", blank=False)  # 变量初始值
     isUse = models.BooleanField(default=True)
+
+
 
     class Meta:
         verbose_name = "计划变量"
@@ -37,6 +38,7 @@ class responseModel(models.Model):
     name = models.CharField("变量名称", max_length=100, default="CODE",blank=False)
     step = models.ForeignKey("stepModel",unique=False, on_delete=models.CASCADE, auto_created=True)
     value = models.CharField("提取参数", max_length=100, default="code", blank=False)
+
 
     class Meta:
         verbose_name = "提取器"
@@ -54,7 +56,7 @@ class assertModel(models.Model):
         GTE = '>=', _('大于等')
         LTE = '<=', _('小于等')
 
-    name = models.CharField("变量名称", max_length=100, default="CODE",blank=False)
+    name = models.CharField("变量名称", max_length=100, default="{{CODE}}",blank=False)
     step = models.ForeignKey("stepModel",unique=False, on_delete=models.CASCADE, auto_created=True)
     func = models.CharField("计算方法", max_length=5, default=funcChoices.EQL, choices=funcChoices.choices,blank=False)
     value = models.CharField("验证值", max_length=100, default=0, blank=False)
@@ -76,11 +78,12 @@ class calculateModel(models.Model):
         MULT = 'mult', _('乘')
         DIV = "div", _('除')
 
-    name = models.CharField("变量名称", max_length=100, default="variableName",blank=False)
+    name = models.CharField("变量名称", max_length=100, default="variable0",blank=False)
     step = models.ForeignKey("stepModel",unique=False, on_delete=models.CASCADE, auto_created=True)
-    value1 = models.CharField("参数1", max_length=100, default="", blank=False)
+    value1 = models.CharField("参数1", max_length=100, default="{{variable1}}", blank=False)
     func = models.CharField("计算方法", max_length=5, default=funcChoices.ADD, choices=funcChoices.choices, blank=False)
-    value2 = models.CharField("参数2", max_length=100, default="", blank=False)
+    value2 = models.CharField("参数2", max_length=100, default="100", blank=False)
+
 
     class Meta:
         verbose_name = "计算器"
@@ -95,15 +98,22 @@ class onStepModel(models.Model):
         POST = "POST", _('POST')
         GET = 'GET', _('GET')
 
+
+
     name = models.CharField(stepReplace[stepFiler.interfaceName], max_length=500, default=None, blank=False)
     host = models.CharField(stepReplace[stepFiler.host], max_length=200, default="", blank=False)
     path = models.CharField(stepReplace[stepFiler.path], max_length=200, default="", blank=False)
     method = models.CharField(stepReplace[stepFiler.method], max_length=5, choices=methodTypeChoices.choices,default=methodTypeChoices.POST)  # 步骤方法,应隶属步骤类型
-    params = models.JSONField(stepReplace[stepFiler.params], max_length=500, default=None, blank=False)
+    params = models.JSONField(stepReplace[stepFiler.params], max_length=500, default=None, blank=True)
+
+
+
 
     class Meta:
-        verbose_name = "接口信息"
-        verbose_name_plural = "接口信息"
+        verbose_name = "访问接口详情"
+        verbose_name_plural = "访问接口详情"
+
+        ordering = ['name']
 
     def __str__(self):
         return "{}： {}".format(self.name,self.path)
@@ -125,25 +135,21 @@ class stepModel(models.Model):
         verbose_name = "测试步骤"
         verbose_name_plural = "003-接口步骤"
 
+        ordering = ["stepNumber"]
+
 
     name = models.CharField(stepReplace[stepFiler.stepFaceName], max_length=500, default=None, blank=False)
     onStep = models.ForeignKey("onStepModel",unique=False, on_delete=models.CASCADE, auto_created=True)
-    # beforeStep = models.ManyToManyField(variableModel, stepReplace[stepFiler.assertList], max_length=500, default=None, blank=False)
 
-    # responseName = models.CharField("提取的变量名称", max_length=100, default="variableName",blank=False)
-    # responseValue = models.CharField("提取变量的方法", max_length=100, default="a.b.0.c", blank=False)
+    stepNumber = models.IntegerField("步骤序号",default=10001, auto_created=True)
 
-    # response = models.ManyToManyField(responseModel, stepReplace[stepFiler.returnData], max_length=500, default=None, blank=True)
-    # calculate = models.ManyToManyField(calculateModel, stepReplace[stepFiler.calculator], max_length=500, default=None, blank=True)
-    # asserts = models.ManyToManyField(assertModel, stepReplace[stepFiler.assertList], max_length=500, default=None, blank=True)
-
-
-    created_time = models.DateTimeField(caseReplace[caseFiler.updateTime], default=datetime.datetime.now())  # 创建时间
-    updated_time = models.DateTimeField(caseReplace[caseFiler.createTime], default=datetime.datetime.now())  # 更新时间
+    created_time = models.DateTimeField(caseReplace[caseFiler.createTime], auto_now=True)  # 创建时间
+    updated_time = models.DateTimeField(caseReplace[caseFiler.updateTime], auto_now_add=True)  # 更新时间
     isUse = models.BooleanField(caseReplace[caseFiler.isUse], default=True)
 
+
     def __str__(self):
-        return "{}".format(self.name)
+        return "{}-{}".format(self.stepNumber, self.name)
 
 
 
@@ -152,14 +158,17 @@ class caseModel(models.Model):
     name = models.CharField(caseReplace[caseFiler.caseName], max_length=500, default=None, blank=False)
     # variable = models.ManyToManyField(variableModel, default=None)
     step = models.ManyToManyField(stepModel, default=None, blank=True)
-    created_time = models.DateTimeField(caseReplace[caseFiler.updateTime], default=datetime.datetime.now())  # 创建时间
-    updated_time = models.DateTimeField(caseReplace[caseFiler.createTime], default=datetime.datetime.now())  # 更新时间
+
+    created_time = models.DateTimeField(caseReplace[caseFiler.createTime], auto_now=True)  # 创建时间
+    updated_time = models.DateTimeField(caseReplace[caseFiler.updateTime], auto_now_add=True)  # 更新时间
     isUse = models.BooleanField(caseReplace[caseFiler.isUse], default=True)
 
     class Meta:
         verbose_name = "测试用例"
         verbose_name_plural = "002-测试用例"
         default_related_name = "用例集"
+
+        ordering = ["name"]
 
     def __str__(self):
         return "{}".format(self.name)
@@ -182,8 +191,9 @@ class planModel(models.Model):
                                 default=appTypeTextChoices.MAIN)
     case_list = models.ManyToManyField(caseModel,"用例集", default=None, blank=True)
     # variable = models.ForeignKey("variableModel",on_delete=models.CASCADE,default=None,blank=True)
-    created_time = models.DateTimeField(planReplace[planFiler.updateTime], default=datetime.datetime.now())  # 创建时间
-    updated_time = models.DateTimeField(planReplace[planFiler.createTime], default=datetime.datetime.now())  # 更新时间
+
+    created_time = models.DateTimeField(caseReplace[caseFiler.createTime], auto_now=True)  # 创建时间
+    updated_time = models.DateTimeField(caseReplace[caseFiler.updateTime], auto_now_add=True)  # 更新时间
     isUse = models.BooleanField(planReplace[planFiler.isUse], default=True)
 
     class Meta:

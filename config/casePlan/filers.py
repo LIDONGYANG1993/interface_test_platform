@@ -44,6 +44,7 @@ class filersYAPI:
     is_update = "is_update"
     is_cover = "is_cover"
 
+
 class mangoDone:
     set = "$set"  # 修改数据 操作符
     type = "$type"  # 类型查询 操作符
