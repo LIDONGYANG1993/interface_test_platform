@@ -32,7 +32,6 @@ ALLOWED_HOSTS = ["192.168.17.32","0.0.0.0"]
 
 INSTALLED_APPS = [
     "import_export",
-    "polls.apps.PollsConfig",
     "casePlan.apps.CaseplanConfig",
     'django.contrib.admin',
     'django.contrib.auth',

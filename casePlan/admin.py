@@ -15,17 +15,6 @@ class publicAdmin(ImportExportModelAdmin):
     list_display_links = ["id", "name"]  # 展示字段链接
     search_fields = ["name", "id"]  # 搜索字段
     list_select_related = True
-    # actions = ["add","change"]
-    # actions_on_bottom = True
-    # search_help_text = "??"
-    # autocomplete_fields = ["name"]
-
-    # def get_readonly_fields(self, request, obj=None):
-    #     if obj:
-    #         readonly_fields = ("created_time", "updated_time")  # 可新增不可修改
-    #     else:
-    #         readonly_fields = ("created_time", )
-    #     return readonly_fields
 
     list_per_page = 50
 
@@ -72,8 +61,6 @@ class responseStacked(admin.StackedInline):
     show_change_link = True
 
 
-    # classes = ["collapse"]
-
 
 class variableLine(publicLine):
     model = variableModel
@@ -97,7 +84,7 @@ class onStepAdmin(publicAdmin):
 class stepAdmin(publicAdmin):
     fieldsets = [
         (None, {'fields': ['name']}),
-        ('基本信息', {'fields': ["onStep","stepNumber",], 'classes': ['toggle']}),
+        ('基本信息', {'fields': ["onStep","stepNumber",], 'classes': ['collapse']}),
     ]
     inlines = [responseStacked, calculateLine, assertLine]
     list_display = ("id","stepNumber", 'name', "created_time", "updated_time")
@@ -113,6 +100,11 @@ class caseAdmin(publicAdmin):
     autocomplete_fields = ["step"]
     # inlines = [stepLine]
     list_display = ("id", 'name', "step_str","created_time", "updated_time")
+
+    fieldsets = [
+        (None, {'fields': ['name']}),
+        ('基本信息', {'fields': ["step",], 'classes': ['collapse']}),
+    ]
     filter_horizontal = ["step", ]
     ordering = ["name"]
 
