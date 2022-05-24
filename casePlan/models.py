@@ -156,7 +156,6 @@ class stepModel(models.Model):
 
 class caseModel(models.Model):
     name = models.CharField(caseReplace[caseFiler.caseName], max_length=500, default=None, blank=False)
-    # variable = models.ManyToManyField(variableModel, default=None)
     step = models.ManyToManyField(stepModel, default=None, blank=True)
 
     created_time = models.DateTimeField(caseReplace[caseFiler.createTime], auto_now=True)  # 创建时间
