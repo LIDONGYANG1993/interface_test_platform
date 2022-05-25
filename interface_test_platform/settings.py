@@ -11,10 +11,8 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from pathlib import Path
-import mongoengine
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
@@ -25,20 +23,31 @@ SECRET_KEY = 'django-insecure-hbetbnyfrfe@*cyb^i5#m08sbpxcby6-_9b(c--3inju^neiu1
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["192.168.17.32","0.0.0.0"]
-
+ALLOWED_HOSTS = ["192.168.17.32", "0.0.0.0"]
 
 # Application definition
 
 INSTALLED_APPS = [
     "import_export",
-    "casePlan.apps.CaseplanConfig",
+    "django_json_widget",
+    "case_plan.apps.CaseplanConfig",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    "django_simple_tags",
+    # "django_admin_json_editor",
+    # "prettyjson",
+    # "grappelli",
+    # "bootstrap_form_horizontal",
+    # "django_horizontal_list_filter",
+    # "django_jsonfield_widget",
+]
+
+MIDDLEWARE_CLASSES = [
 ]
 
 MIDDLEWARE = [
@@ -52,7 +61,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'interface_test_platform.urls'
-
+STATIC_ROOT = "./templates"
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -72,7 +81,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'interface_test_platform.wsgi.application'
 
-
 # Database 默认配置
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
@@ -88,7 +96,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'OPTIONS': {
-            'read_default_file':BASE_DIR / 'config/my.cnf'
+            'read_default_file': BASE_DIR / 'config/my.cnf'
         },
     }
 }
@@ -118,7 +126,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
 
@@ -132,7 +139,6 @@ TIME_ZONE = 'Asia/Shanghai'
 USE_I18N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/

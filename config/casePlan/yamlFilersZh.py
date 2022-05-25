@@ -23,28 +23,25 @@ caseReplace = {
     caseFiler.caseName: "用例名称",
     caseFiler.variable: "局部变量",
     caseFiler.stepList: "步骤列表",
-    planFiler.isUse: "是否可用",
-    planFiler.dataId: "编号",
-    planFiler.createTime: "创建时间",
-    planFiler.updateTime: "更新时间",
+    caseFiler.isUse: "是否可用",
+    caseFiler.dataId: "编号"
 }
 
 stepReplace = {
     stepFiler.stepNumber: "步骤序号",
-    stepFiler.stepFaceName: "步骤名称",
+    stepFiler.stepName: "步骤名称",
     stepFiler.stepType: "步骤类型",
+    stepFiler.requestInfo: "接口访问信息",
     stepFiler.interfaceName: "接口名称",
     stepFiler.method: "方法",
     stepFiler.path: "接口请求路径",
     stepFiler.host: "接口请求host",
     stepFiler.interfaceList: "接口id",
-    stepFiler.params: "参数集",
+    stepFiler.params: "",
     stepFiler.returnData: "变量提取器",
     stepFiler.calculator: "变量计算器",
     stepFiler.assertList: "结果验证器",
-    planFiler.dataId: "编号",
-    planFiler.createTime: "创建时间",
-    planFiler.updateTime: "更新时间",
+    stepFiler.dataId: "编号"
 
 }
 
@@ -52,22 +49,20 @@ variableReplace = {
     variableFiler.name: "变量名称",
     variableFiler.type: "变量类型",
     variableFiler.value: "值",
+    variableFiler.plan: "所属计划",
     variableFiler.isUse: "是否可用",
-    planFiler.dataId: "编号",
-    planFiler.createTime: "创建时间",
-    planFiler.updateTime: "更新时间",
+    variableFiler.dataId: "编号"
 }
 
 
-returnDataReplace = {
-    resDataFiler.name: "变量名称",
-    resDataFiler.type: "变量类型",
-    resDataFiler.fieldPath: "提取结果路径",
-    resDataFiler.isGlobal: "是否全局",
-    resDataFiler.isUse: "是否可用",
-    planFiler.dataId: "编号",
-    planFiler.createTime: "创建时间",
-    planFiler.updateTime: "更新时间",
+responseReplace = {
+    responseFiler.name: "变量名称",
+    responseFiler.type: "变量类型",
+    responseFiler.fieldPath: "提取内容",
+    responseFiler.isGlobal: "是否全局",
+    responseFiler.isUse: "是否可用",
+    responseFiler.step: "所属步骤",
+    responseFiler.dataId: "编号"
 }
 
 
@@ -79,9 +74,8 @@ calculatorReplace = {
     calculatorFiler.calFunction: "计算方法",
     calculatorFiler.isGlobal: "是否全局",
     calculatorFiler.isUse: "是否可用",
-    planFiler.dataId: "编号",
-    planFiler.createTime: "创建时间",
-    planFiler.updateTime: "更新时间",
+    calculatorFiler.step: "所属步骤",
+    calculatorFiler.dataId: "编号"
 }
 
 assertsReplace = {
@@ -89,7 +83,6 @@ assertsReplace = {
     assertsFiler.assertMethod: "验证方法",
     assertsFiler.value2: "验证值-2",
     assertsFiler.isUse: "是否可用",
-    planFiler.dataId: "编号",
-    planFiler.createTime: "创建时间",
-    planFiler.updateTime: "更新时间",
+    assertsFiler.dataId: "编号",
+    assertsFiler.step: "所属步骤",
 }

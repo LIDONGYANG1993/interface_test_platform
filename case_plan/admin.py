@@ -1,22 +1,32 @@
+from django import forms, db
 from django.contrib import admin
 
 # Register your models here.
-
+from django.db.models import JSONField
+from django_json_widget.widgets import JSONEditorWidget
 from import_export import resources
 from import_export.admin import ImportExportModelAdmin
-from import_export import fields
 from import_export.formats import base_formats
 from .models import *
 
 
+
 class publicAdmin(ImportExportModelAdmin):
+
 
     list_display = ["id", 'name',]  # 展示字段
     list_display_links = ["id", "name"]  # 展示字段链接
+    readonly_fields = ["create_user","update_user", "created_time", "updated_time"]
     search_fields = ["name", "id"]  # 搜索字段
+    empty_value_display = '无'  # 默认空值展示字段
     list_select_related = True
-
     list_per_page = 50
+
+    def save_model(self, request, obj:step, form, change):  # 自动保存修改和创建人
+        if not change:
+            obj.create_user = request.user
+        obj.update_user = request.user
+        super().save_model(request, obj, form, change)
 
     def has_add_permission(self, request):
         # 禁用添加按钮
@@ -36,80 +46,95 @@ class publicAdmin(ImportExportModelAdmin):
 
 class stepResources(resources.ModelResource):
     class Meta:
-        model = stepModel
+        model = step
 
 
 class publicLine(admin.TabularInline):
     extra = 0
-
+    fk_name = []
 
 
 class calculateLine(publicLine):
-    model = calculateModel
+    model = calculater
+
 
 
 class assertLine(publicLine):
-    model = assertModel
+    model = asserts
 
 
 class responseLine(publicLine):
-    model = responseModel
+    model = response
 
 
 class responseStacked(admin.StackedInline):
-    model = responseModel
+    model = response
     show_change_link = True
 
 
 
 class variableLine(publicLine):
-    model = variableModel
+    model = variable
 
 
 class stepLine(publicLine):
-    model = stepModel
+    model = step
+    sortable_field_name = "stepNumber"
 
 
-@admin.register(variableModel)
+@admin.register(variable)
 class variableAdmin(publicAdmin):
     list_display = ("id", 'name', 'value')
 
 
-@admin.register(onStepModel)
+
+
+
+@admin.register(onStep)
 class onStepAdmin(publicAdmin):
     list_display = ("id", 'name', 'path', 'params')
+    fieldsets = [
+        (None, {'fields': ['name']}),
+        ('基本信息', {'fields': ["host","path",]}),
+        ("参数集", {"fields": ["params"]}),
+    ]
+    formfield_overrides = {
+        JSONField: {'widget': JSONEditorWidget},
+    }
 
 
-@admin.register(stepModel)
+
+
+@admin.register(step)
 class stepAdmin(publicAdmin):
     fieldsets = [
         (None, {'fields': ['name']}),
-        ('基本信息', {'fields': ["onStep","stepNumber",], 'classes': ['collapse']}),
+        ('基本信息', {'fields': ["onStep","stepNumber",]})
     ]
-    inlines = [responseStacked, calculateLine, assertLine]
-    list_display = ("id","stepNumber", 'name', "created_time", "updated_time")
+    inlines = [responseLine, calculateLine, assertLine]
+    list_display = ("id","stepNumber", 'name',"create_user", "update_user", "created_time", "updated_time")
+
+
+
     autocomplete_fields = []
 
 
-@admin.register(caseModel)
+@admin.register(case)
 class caseAdmin(publicAdmin):
     @staticmethod
-    def step_str(obj:caseModel):
+    def step_str(obj:case):
         return [rel for rel in obj.step.all().order_by("name")]
 
-    autocomplete_fields = ["step"]
-    # inlines = [stepLine]
     list_display = ("id", 'name', "step_str","created_time", "updated_time")
-
+    filter_horizontal = ["step", ]
     fieldsets = [
         (None, {'fields': ['name']}),
-        ('基本信息', {'fields': ["step",], 'classes': ['collapse']}),
+        ('用例步骤列表`', {'fields': ["step",]}),
     ]
-    filter_horizontal = ["step", ]
     ordering = ["name"]
 
 
-@admin.register(planModel)
+@admin.register(plan)
 class planAdmin(publicAdmin):
 
     @staticmethod
@@ -118,24 +143,24 @@ class planAdmin(publicAdmin):
 
     fieldsets = [
         (None, {'fields': ['name']}),
-        ('基本信息', {'fields': ["environment", "app_type", "case_list"], 'classes': ['collapse']}),
+        ('基本信息', {'fields': ["environment", "app_type", "case"]}),
     ]
     inlines = [variableLine]
 
     list_display = ("id", 'name', "case_list_str", "created_time", "updated_time")
-    autocomplete_fields = ["case_list", ]
+    autocomplete_fields = ["case", ]
 
 
-@admin.register(assertModel)
+@admin.register(asserts)
 class assertAdmin(publicAdmin):
     pass
 
 
-@admin.register(responseModel)
+@admin.register(response)
 class responseAdmin(publicAdmin):
     pass
 
 
-@admin.register(calculateModel)
+@admin.register(calculater)
 class calculateAdmin(publicAdmin):
     pass

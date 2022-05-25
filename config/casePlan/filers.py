@@ -61,6 +61,7 @@ class variableFiler:
     type = "type"  # 变量类型
     value = "value"  # 变量初始值
     isUse = "isUse"
+    plan = "plan"
 
     dataId = "id"
     createTime = "createTime"
@@ -76,6 +77,7 @@ class planFiler:
     globalVariable = "globalVariable"  # 全局变量 所有的变量，会在每次执行该计划时，初始化
     caseList = "caseList"  # 场景用例列表
     isUse = "isUse"
+    step = "step"
     createTime = "createTime"
     updateTime = "updateTime"
 
@@ -94,7 +96,8 @@ class caseFiler:
 
 class stepFiler:
     stepNumber = "stepNumber"  # 步骤编号，考虑是否自动生成
-    stepFaceName = "stepFaceName"  # 步骤名称
+    stepName = "stepName"  # 步骤名称
+    requestInfo = "requestInfo"  # 步骤名称
     stepType = "stepType"  # 步骤类型，WEBAPI请求， API请求，数据库请求，redis请求
     method = "method"  # 步骤方法,应隶属步骤类型
     interfaceList = "interfaceList"  # 接口id,当该步骤是描述一个接口的时候，需要该id，否则不需要，可以为空
@@ -135,18 +138,21 @@ class interfaceFiler:
 
 
 
-class resDataFiler:
+class responseFiler:
     name = "name"  # 提取器存储名称，
+    step = "step"  # 提取器存储名称，
     fieldPath = "fieldPath"   # 提取路径，返回值是json格式的情况，采用A.b.c.0.d的方法，提取数值，
     type = "type"   # 数据存储类型，number"浮点型，str"字符串型；
     isGlobal = "isGlobal"
     isUse = "isUse"
+    dataId = "id"
 
 
 class calculatorFiler:
     name = "name"  # 提取器存储名称，
     Variable1 = "Variable1"  # 变量1
     Variable2 = "Variable2"  # 变量2
+    step = "step"
     type = "type"  # 计算类型
     isGlobal = "isGlobal"
     calFunction = "calFunction"  # 计算方式，add , subtract , multiply  divide  对应，+ - * ÷
@@ -161,6 +167,7 @@ class assertsFiler:
     value1 = "value1"  # 验证变量名称1，可以引用全局变量，或者局部变量，也可以输入值；
     assertMethod = "assertMethod"  # 验证方法，如果变量，是数字，可选方法 gt lt equal 对应大于， 等于，小于, 如果变量是类型，可选方法 is，in， not_in 对应相同，
     isUse = "isUse"
+    step = "step"
     value2 = "value2"  # 验证变量名称2，可以引用全局变量，或者局部变量，也可以输入值；
 
     dataId = "id"
