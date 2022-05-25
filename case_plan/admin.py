@@ -22,10 +22,15 @@ class publicAdmin(ImportExportModelAdmin):
     list_select_related = True
     list_per_page = 50
 
+
+    formfield_overrides = {
+        JSONField: {'widget': JSONEditorWidget},
+    }
+
     def save_model(self, request, obj:step, form, change):  # 自动保存修改和创建人
         if not change:
-            obj.create_user = request.user
-        obj.update_user = request.user
+            obj.create_user = request.user.username
+        obj.update_user = request.user.username
         super().save_model(request, obj, form, change)
 
     def has_add_permission(self, request):
@@ -51,25 +56,27 @@ class stepResources(resources.ModelResource):
 
 class publicLine(admin.TabularInline):
     extra = 0
-    fk_name = []
 
 
 class calculateLine(publicLine):
     model = calculater
 
 
+class responseLine(publicLine):
+    model = response
+
 
 class assertLine(publicLine):
     model = asserts
 
 
-class responseLine(publicLine):
-    model = response
 
 
-class responseStacked(admin.StackedInline):
-    model = response
-    show_change_link = True
+class caseAssertLine(assertLine):
+    classes = ["collapse"]
+
+
+
 
 
 
@@ -98,9 +105,6 @@ class onStepAdmin(publicAdmin):
         ('基本信息', {'fields': ["host","path",]}),
         ("参数集", {"fields": ["params"]}),
     ]
-    formfield_overrides = {
-        JSONField: {'widget': JSONEditorWidget},
-    }
 
 
 
@@ -109,7 +113,9 @@ class onStepAdmin(publicAdmin):
 class stepAdmin(publicAdmin):
     fieldsets = [
         (None, {'fields': ['name']}),
-        ('基本信息', {'fields': ["onStep","stepNumber",]})
+        ('基本信息', {'fields': ["onStep","stepNumber",]}),
+
+        ('替换参数', {'fields': ["params",], "classes":["collapse", ]})
     ]
     inlines = [responseLine, calculateLine, assertLine]
     list_display = ("id","stepNumber", 'name',"create_user", "update_user", "created_time", "updated_time")
@@ -123,14 +129,16 @@ class stepAdmin(publicAdmin):
 class caseAdmin(publicAdmin):
     @staticmethod
     def step_str(obj:case):
-        return [rel for rel in obj.step.all().order_by("name")]
+        return [rel for rel in obj.step.all()]
 
     list_display = ("id", 'name', "step_str","created_time", "updated_time")
     filter_horizontal = ["step", ]
     fieldsets = [
         (None, {'fields': ['name']}),
-        ('用例步骤列表`', {'fields': ["step",]}),
+        ('用例步骤列表', {'fields': ["step",]})
     ]
+
+    inlines = [caseAssertLine]
     ordering = ["name"]
 
 
@@ -139,7 +147,12 @@ class planAdmin(publicAdmin):
 
     @staticmethod
     def case_list_str(obj):
-        return [rel for rel in obj.name.all().order_by("name")]
+        return [rel for rel in obj.case.all().order_by("name")]
+
+
+    @staticmethod
+    def val_list_str(obj):
+        return [rel for rel in obj.variable.all().order_by("name")]
 
     fieldsets = [
         (None, {'fields': ['name']}),
@@ -147,7 +160,7 @@ class planAdmin(publicAdmin):
     ]
     inlines = [variableLine]
 
-    list_display = ("id", 'name', "case_list_str", "created_time", "updated_time")
+    list_display = ("id", 'name', "case_list_str", "val_list_str","create_user","updated_time")
     autocomplete_fields = ["case", ]
 
 

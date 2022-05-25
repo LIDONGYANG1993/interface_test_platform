@@ -37,7 +37,8 @@ stepReplace = {
     stepFiler.path: "接口请求路径",
     stepFiler.host: "接口请求host",
     stepFiler.interfaceList: "接口id",
-    stepFiler.params: "",
+    stepFiler.params: "默认参数",
+    stepFiler.reParams: "替换参数",
     stepFiler.returnData: "变量提取器",
     stepFiler.calculator: "变量计算器",
     stepFiler.assertList: "结果验证器",
@@ -59,6 +60,7 @@ responseReplace = {
     responseFiler.name: "变量名称",
     responseFiler.type: "变量类型",
     responseFiler.fieldPath: "提取内容",
+    responseFiler.condition: "提取条件",
     responseFiler.isGlobal: "是否全局",
     responseFiler.isUse: "是否可用",
     responseFiler.step: "所属步骤",
@@ -85,4 +87,5 @@ assertsReplace = {
     assertsFiler.isUse: "是否可用",
     assertsFiler.dataId: "编号",
     assertsFiler.step: "所属步骤",
+    assertsFiler.case: "所属用例",
 }

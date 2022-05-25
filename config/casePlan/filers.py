@@ -102,6 +102,7 @@ class stepFiler:
     method = "method"  # 步骤方法,应隶属步骤类型
     interfaceList = "interfaceList"  # 接口id,当该步骤是描述一个接口的时候，需要该id，否则不需要，可以为空
     params = "params"  # 参数
+    reParams = "reParams"  # 参数
     interfaceName = "interfaceName"  # 接口名称
     returnData = "returnData"  # 提取器
     calculator = "calculator"  # 计算器
@@ -143,6 +144,7 @@ class responseFiler:
     step = "step"  # 提取器存储名称，
     fieldPath = "fieldPath"   # 提取路径，返回值是json格式的情况，采用A.b.c.0.d的方法，提取数值，
     type = "type"   # 数据存储类型，number"浮点型，str"字符串型；
+    condition = "condition"   # 数据存储类型，number"浮点型，str"字符串型；
     isGlobal = "isGlobal"
     isUse = "isUse"
     dataId = "id"
@@ -168,6 +170,7 @@ class assertsFiler:
     assertMethod = "assertMethod"  # 验证方法，如果变量，是数字，可选方法 gt lt equal 对应大于， 等于，小于, 如果变量是类型，可选方法 is，in， not_in 对应相同，
     isUse = "isUse"
     step = "step"
+    case = "case"
     value2 = "value2"  # 验证变量名称2，可以引用全局变量，或者局部变量，也可以输入值；
 
     dataId = "id"

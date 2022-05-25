@@ -17,7 +17,8 @@ class publicModel(models.Model):
     related_name = "public"
     created_time = models.DateTimeField(verbose_name="创建时间", auto_now=True)  # 创建时间
     updated_time = models.DateTimeField(verbose_name="更新时间", auto_now_add=True)  # 更新时间
-    create_user = models.ForeignKey(settings.AUTH_USER_MODEL,verbose_name="创建者", unique=False, on_delete=models.CASCADE,blank=True,editable=False)
+
+    create_user = models.CharField(verbose_name="创建者",max_length=100,blank=True,editable=False)
     update_user = models.CharField(verbose_name="更新者",max_length=100,blank=True,editable=False)
     is_use = models.BooleanField("是否可用", default=True, editable=False,blank=True)
 
@@ -71,7 +72,7 @@ class publicModel(models.Model):
 class variable(publicModel):
     related_name = "variable"
     name = models.CharField(variableReplace[variableFiler.name],max_length=500, default=None, blank=False)  # 变量名称
-    plan = models.ForeignKey("plan",verbose_name=variableReplace[variableFiler.plan], on_delete=models.CASCADE, default=None, blank=True)
+    plan = models.ForeignKey("plan",verbose_name=variableReplace[variableFiler.plan], on_delete=models.CASCADE, default=None, blank=True,related_name="variable")
     value = models.CharField(variableReplace[variableFiler.value],max_length=500, default="", blank=False)  # 变量初始值
 
     class Meta:
@@ -86,9 +87,11 @@ class variable(publicModel):
 
 class response(publicModel):
     related_name = "response"
-    step = models.ForeignKey("step", verbose_name=responseReplace[responseFiler.step], unique=False, on_delete=models.CASCADE, auto_created=True, blank=True)
-    name = models.CharField(responseReplace[responseFiler.name], max_length=100, default="CODE", blank=False)
+    step = models.ForeignKey("step", verbose_name=responseReplace[responseFiler.step], unique=False, on_delete=models.CASCADE, blank=False, editable=False, null=True)
+    name = models.CharField(responseReplace[responseFiler.name], max_length=100, default="code_0", blank=False)
     value = models.CharField(responseReplace[responseFiler.fieldPath], max_length=100, default="code", blank=False)
+    condition = models.CharField(responseReplace[responseFiler.condition], max_length=100, default="", blank=True)
+    forDefault = models.CharField("无意义字段【忽略】", max_length=1, default=0, blank=True)  # 该字段无意义，仅为掩盖Djongo的默认不保存缺陷而建立
 
     class Meta:
         verbose_name = "提取器"
@@ -101,7 +104,8 @@ class response(publicModel):
 class asserts(publicModel):
     related_name = "asserts"
     name = models.CharField(assertsReplace[assertsFiler.value1], max_length=100, default="{{CODE}}", blank=False)
-    step = models.ForeignKey("step", verbose_name=assertsReplace[assertsFiler.step],unique=False, on_delete=models.CASCADE)
+    step = models.ForeignKey("step", verbose_name=assertsReplace[assertsFiler.step],unique=False, on_delete=models.CASCADE, blank=True, editable=False, null=True)
+    case = models.ForeignKey("case", verbose_name=assertsReplace[assertsFiler.case],unique=False, on_delete=models.CASCADE, blank=True, editable=False, null=True)
     func = models.CharField(assertsReplace[assertsFiler.assertMethod], max_length=5, default=publicModel.funcChoices.EQL, choices=publicModel.funcChoices.choices, blank=False)
     name_another = models.CharField(assertsReplace[assertsFiler.value2], max_length=100, default=0, blank=False)
 
@@ -119,7 +123,7 @@ class calculater(publicModel):
     step = models.ForeignKey("step",verbose_name=calculatorReplace[calculatorFiler.step], unique=False, on_delete=models.CASCADE)
     value1 = models.CharField(calculatorReplace[calculatorFiler.Variable1], max_length=100, default="{{variable1}}", blank=False)
     func = models.CharField(calculatorReplace[calculatorFiler.calFunction], max_length=5, default=publicModel.calChoices.ADD, choices=publicModel.calChoices.choices, blank=False)
-    value2 = models.CharField(calculatorReplace[calculatorFiler.Variable2], max_length=100, default="100", blank=False)
+    value2 = models.CharField(calculatorReplace[calculatorFiler.Variable2], max_length=100, default=100, blank=False)
 
     class Meta:
         verbose_name = "计算器"
@@ -152,6 +156,7 @@ class step(publicModel):
     related_name = "step"
     name = models.CharField(stepReplace[stepFiler.stepName], max_length=500, default=None, blank=False)
     onStep = models.ForeignKey("onStep", verbose_name=stepReplace[stepFiler.requestInfo], unique=False, on_delete=models.CASCADE)
+    params = models.JSONField(stepReplace[stepFiler.reParams], max_length=500, default=dict, blank=True)
     stepNumber = models.IntegerField(stepReplace[stepFiler.stepNumber], default=10001, auto_created=True)
 
     class Meta:
