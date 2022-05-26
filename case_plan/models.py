@@ -22,6 +22,7 @@ class publicModel(models.Model):
     update_user = models.CharField(verbose_name="更新者",max_length=100,blank=True,editable=False)
     is_use = models.BooleanField("是否可用", default=True, editable=False,blank=True)
 
+
     # 类型选择器
     class typeChoices(models.TextChoices):
         STR = 'STR', _('字符串')

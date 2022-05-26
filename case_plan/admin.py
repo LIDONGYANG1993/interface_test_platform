@@ -14,9 +14,9 @@ from .models import *
 class publicAdmin(ImportExportModelAdmin):
 
 
-    list_display = ["id", 'name',]  # 展示字段
+    list_display = ["id", 'name', "created_time", "updated_time"]  # 展示字段
     list_display_links = ["id", "name"]  # 展示字段链接
-    readonly_fields = ["create_user","update_user", "created_time", "updated_time"]
+    readonly_fields = ["created_time", "updated_time"]
     search_fields = ["name", "id"]  # 搜索字段
     empty_value_display = '无'  # 默认空值展示字段
     list_select_related = True
@@ -136,7 +136,7 @@ class caseAdmin(publicAdmin):
     def step_str(obj:case):
         return [rel for rel in obj.step.all()]
 
-    list_display = ("id", 'name', "step_str","created_time", "updated_time")
+    list_display = ("id", 'name', "step_str","create_user","update_user","created_time", "updated_time")
     filter_horizontal = ["step", ]
     fieldsets = [
         (None, {'fields': ['name']}),
@@ -165,7 +165,7 @@ class planAdmin(publicAdmin):
     ]
     inlines = [variableLine]
 
-    list_display = ("id", 'name', "case_list_str", "val_list_str","create_user","updated_time")
+    list_display = ("id", 'name', "case_list_str", "val_list_str","create_user","update_user","created_time", "updated_time")
     autocomplete_fields = ["case", ]
 
 
