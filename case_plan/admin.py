@@ -71,17 +71,22 @@ class assertLine(publicLine):
 
 
 
+class variableLine(publicLine):
+    model = variable
+
 
 class caseAssertLine(assertLine):
     classes = ["collapse"]
 
 
 
+class caseVariableLine(variableLine):
+    verbose_name = "用例变量"
+    classes = ["collapse"]
 
 
 
-class variableLine(publicLine):
-    model = variable
+
 
 
 class stepLine(publicLine):
@@ -138,7 +143,7 @@ class caseAdmin(publicAdmin):
         ('用例步骤列表', {'fields': ["step",]})
     ]
 
-    inlines = [caseAssertLine]
+    inlines = [caseVariableLine, caseAssertLine]
     ordering = ["name"]
 
 

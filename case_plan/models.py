@@ -72,7 +72,8 @@ class publicModel(models.Model):
 class variable(publicModel):
     related_name = "variable"
     name = models.CharField(variableReplace[variableFiler.name],max_length=500, default=None, blank=False)  # 变量名称
-    plan = models.ForeignKey("plan",verbose_name=variableReplace[variableFiler.plan], on_delete=models.CASCADE, default=None, blank=True,related_name="variable")
+    plan = models.ForeignKey("plan",verbose_name=variableReplace[variableFiler.plan], on_delete=models.CASCADE, default=None, blank=True,null=True,editable=False,related_name="variable")
+    case = models.ForeignKey("case",verbose_name=variableReplace[variableFiler.case], on_delete=models.CASCADE, default=None, blank=True,null=True,editable=False, related_name="variable_case")
     value = models.CharField(variableReplace[variableFiler.value],max_length=500, default="", blank=False)  # 变量初始值
 
     class Meta:

@@ -31,9 +31,11 @@ class databaseCase:
     dataId = "_id"
     DataId = "dataId"
 
+
 class configValue:
     name = "name"
     value_cn = "value_cn"
+
 
 class filersYAPI:
     id = "_id"
@@ -60,10 +62,11 @@ class variableFiler:
     name = "name"  # 变量名称
     type = "type"  # 变量类型
     value = "value"  # 变量初始值
-    isUse = "isUse"
-    plan = "plan"
+    plan = "plan"  # 所属计划
+    case = "case"  # 所属用例
 
     dataId = "id"
+    isUse = "isUse"
     createTime = "createTime"
     updateTime = "updateTime"
 
@@ -102,7 +105,8 @@ class stepFiler:
     method = "method"  # 步骤方法,应隶属步骤类型
     interfaceList = "interfaceList"  # 接口id,当该步骤是描述一个接口的时候，需要该id，否则不需要，可以为空
     params = "params"  # 参数
-    reParams = "reParams"  # 参数
+    data = "data"  # 参数
+    reParams = "reParams"  # 替换参数
     interfaceName = "interfaceName"  # 接口名称
     returnData = "returnData"  # 提取器
     calculator = "calculator"  # 计算器
@@ -113,6 +117,7 @@ class stepFiler:
     isUse = "isUse"
     host = "host"
     path = "path"
+    headers = "headers"
     requestMethod = "requestMethod"
 
     dataId = "id"
@@ -144,7 +149,7 @@ class responseFiler:
     step = "step"  # 提取器存储名称，
     fieldPath = "fieldPath"   # 提取路径，返回值是json格式的情况，采用A.b.c.0.d的方法，提取数值，
     type = "type"   # 数据存储类型，number"浮点型，str"字符串型；
-    condition = "condition"   # 数据存储类型，number"浮点型，str"字符串型；
+    condition = "condition"
     isGlobal = "isGlobal"
     isUse = "isUse"
     dataId = "id"
@@ -183,7 +188,6 @@ class configFilersFiler:
     filer = "filer"  # 对应class的某一个字段
     value_list = "value_list"  # 对应字段的及其值，格式是对象，比如assertMethod gt代表大于;{"name":"gt",value_cn:"大于"}
     isUse = "isUse"
-
     dataId = "id"
     createTime = "createTime"
     updateTime = "updateTime"

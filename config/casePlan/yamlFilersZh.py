@@ -51,6 +51,7 @@ variableReplace = {
     variableFiler.type: "变量类型",
     variableFiler.value: "值",
     variableFiler.plan: "所属计划",
+    variableFiler.case: "所属用例",
     variableFiler.isUse: "是否可用",
     variableFiler.dataId: "编号"
 }
