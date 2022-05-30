@@ -1,51 +1,9 @@
-#!../venv/bin/python3
-# -*- coding: utf-8 -*-
-# @Date  : 2022/05/25
-# @Name  : 杨望宇
-import json
+
+import django
+django.setup()
 
 
-#  依据路径【path】从字典【dict】中读取数据
-def get_path_dict(_str: str, _dict: dict):
-    str_list = _str.split('.', 1)
-    for rel in str_list:
-        if rel == str_list[-1]:
-            return {_str: _dict[rel]}
-        if rel.isdigit():
-            return get_path_dict(str_list[1], _dict[int(rel)])
-        if rel in _dict.keys():
-            return get_path_dict(str_list[1], _dict[rel])
-        return {_str: None}
+planTest = {"id": 1, "caseList": [{"id": 2, "name": "001-购买逗豆道具-清凉一夏CP框", "variable": [{"id": 2, "name": "LZ_uid", "value": "147556137"}], "stepList": [{"id": 1, "name": "获取用户EZ的资产", "reParams": {"uid": "{{EZ_uid}}"}, "stepNumber": 10001, "requestInfo": {"id": 1, "name": "获取资产接口", "host": "", "path": "/web/webApi/shop/getWebUserCurrency", "params": {"uid": "147556137"}, "method": "POST", "headers": {"uid": "147556137"}, "data": {"uid": "147556137"}}, "assertList": [{"id": 1, "value1": "{{CODE}}", "value2": "0", "assertMethod": "=="}, {"id": 9, "value1": "{{CODE}}", "value2": "0", "assertMethod": ">="}], "calculator": [{"id": 3, "name": "variable0", "Variable1": "{{variable1}}", "Variable2": "100", "calFunction": "add"}], "extractor": [{"id": 1, "name": "diamond1", "value": "data.currencyList.1.count", "condition": ""}, {"id": 2, "name": "CODE", "value": "code", "condition": ""}, {"id": 13, "name": "doudou1", "value": "data.currencyList.[].count", "condition": "currencyType=4"}]}, {"id": 5, "name": "用户EZ用逗豆购买一个CP头像框", "reParams": {"uid": "{{EZ_uid}}", "buyWay": "doudou", "tabCode": "24001", "productCode": "12004"}, "stepNumber": 10002, "requestInfo": {"id": 2, "name": "购买道具接口", "host": "", "path": "/web/webApi/shop/buyWebProduct", "params": {"uid": "147556137", "from": "1001", "misc": "popup", "index": "0", "buyWay": "diamond", "propId": "", "source": "100001", "tabCode": "24001", "tabName": "默认", "buyMember": "0", "priceType": "3", "batchCount": "1", "receiveUid": "", "sourcePage": "", "usedPeriod": "oneDay", "buyLocation": "goods_detail_page", "buyMemberId": "", "productCode": "110001", "pageLocation": "goods_detail_page", "priceChannel": "0", "isMemberPrice": "0"}, "method": "POST", "headers": {"uid": "147556137", "from": "1001", "misc": "popup", "index": "0", "buyWay": "diamond", "propId": "", "source": "100001", "tabCode": "24001", "tabName": "默认", "buyMember": "0", "priceType": "3", "batchCount": "1", "receiveUid": "", "sourcePage": "", "usedPeriod": "oneDay", "buyLocation": "goods_detail_page", "buyMemberId": "", "productCode": "110001", "pageLocation": "goods_detail_page", "priceChannel": "0", "isMemberPrice": "0"}, "data": {"uid": "147556137", "from": "1001", "misc": "popup", "index": "0", "buyWay": "diamond", "propId": "", "source": "100001", "tabCode": "24001", "tabName": "默认", "buyMember": "0", "priceType": "3", "batchCount": "1", "receiveUid": "", "sourcePage": "", "usedPeriod": "oneDay", "buyLocation": "goods_detail_page", "buyMemberId": "", "productCode": "110001", "pageLocation": "goods_detail_page", "priceChannel": "0", "isMemberPrice": "0"}}, "assertList": [{"id": 7, "value1": "{{CODE}}", "value2": "0", "assertMethod": "=="}], "calculator": [], "extractor": [{"id": 12, "name": "code_0", "value": "code", "condition": ""}]}, {"id": 3, "name": "用户EZ再次获取资产", "reParams": {"uid": "{{EZ_uid}}"}, "stepNumber": 10003, "requestInfo": {"id": 1, "name": "获取资产接口", "host": "", "path": "/web/webApi/shop/getWebUserCurrency", "params": {"uid": "147556137"}, "method": "POST", "headers": {"uid": "147556137"}, "data": {"uid": "147556137"}}, "assertList": [{"id": 3, "value1": "{{CODE}}", "value2": "0", "assertMethod": "=="}], "calculator": [{"id": 1, "name": "diamondDet", "Variable1": "{{diamond1}}", "Variable2": "{{diamond2}}", "calFunction": "subtract"}], "extractor": [{"id": 4, "name": "CODE", "value": "code", "condition": ""}, {"id": 5, "name": "diamond2", "value": "data.currencyList.1.count", "condition": ""}, {"id": 14, "name": "doudou2", "value": "data.currencyList.0.count", "condition": "{currencyType:4}"}]}], "assertList": [{"id": 8, "value1": "{{doudouDet}}", "value2": "26850", "assertMethod": "="}]}, {"id": 1, "name": "002-购买钻石道具记牌器", "variable": [], "stepList": [{"id": 1, "name": "获取用户EZ的资产", "reParams": {"uid": "{{EZ_uid}}"}, "stepNumber": 10001, "requestInfo": {"id": 1, "name": "获取资产接口", "host": "", "path": "/web/webApi/shop/getWebUserCurrency", "params": {"uid": "147556137"}, "method": "POST", "headers": {"uid": "147556137"}, "data": {"uid": "147556137"}}, "assertList": [{"id": 1, "value1": "{{CODE}}", "value2": "0", "assertMethod": "=="}, {"id": 9, "value1": "{{CODE}}", "value2": "0", "assertMethod": ">="}], "calculator": [{"id": 3, "name": "variable0", "Variable1": "{{variable1}}", "Variable2": "100", "calFunction": "add"}], "extractor": [{"id": 1, "name": "diamond1", "value": "data.currencyList.1.count", "condition": ""}, {"id": 2, "name": "CODE", "value": "code", "condition": ""}, {"id": 13, "name": "doudou1", "value": "data.currencyList.[].count", "condition": "currencyType=4"}]}, {"id": 2, "name": "用户EZ购买一个记牌器", "reParams": {"uid": "{{EZ_uid}}"}, "stepNumber": 10002, "requestInfo": {"id": 2, "name": "购买道具接口", "host": "", "path": "/web/webApi/shop/buyWebProduct", "params": {"uid": "147556137", "from": "1001", "misc": "popup", "index": "0", "buyWay": "diamond", "propId": "", "source": "100001", "tabCode": "24001", "tabName": "默认", "buyMember": "0", "priceType": "3", "batchCount": "1", "receiveUid": "", "sourcePage": "", "usedPeriod": "oneDay", "buyLocation": "goods_detail_page", "buyMemberId": "", "productCode": "110001", "pageLocation": "goods_detail_page", "priceChannel": "0", "isMemberPrice": "0"}, "method": "POST", "headers": {"uid": "147556137", "from": "1001", "misc": "popup", "index": "0", "buyWay": "diamond", "propId": "", "source": "100001", "tabCode": "24001", "tabName": "默认", "buyMember": "0", "priceType": "3", "batchCount": "1", "receiveUid": "", "sourcePage": "", "usedPeriod": "oneDay", "buyLocation": "goods_detail_page", "buyMemberId": "", "productCode": "110001", "pageLocation": "goods_detail_page", "priceChannel": "0", "isMemberPrice": "0"}, "data": {"uid": "147556137", "from": "1001", "misc": "popup", "index": "0", "buyWay": "diamond", "propId": "", "source": "100001", "tabCode": "24001", "tabName": "默认", "buyMember": "0", "priceType": "3", "batchCount": "1", "receiveUid": "", "sourcePage": "", "usedPeriod": "oneDay", "buyLocation": "goods_detail_page", "buyMemberId": "", "productCode": "110001", "pageLocation": "goods_detail_page", "priceChannel": "0", "isMemberPrice": "0"}}, "assertList": [{"id": 2, "value1": "{{CODE}}", "value2": "0", "assertMethod": "=="}], "calculator": [], "extractor": [{"id": 3, "name": "CODE", "value": "code", "condition": ""}]}, {"id": 3, "name": "用户EZ再次获取资产", "reParams": {"uid": "{{EZ_uid}}"}, "stepNumber": 10003, "requestInfo": {"id": 1, "name": "获取资产接口", "host": "", "path": "/web/webApi/shop/getWebUserCurrency", "params": {"uid": "147556137"}, "method": "POST", "headers": {"uid": "147556137"}, "data": {"uid": "147556137"}}, "assertList": [{"id": 3, "value1": "{{CODE}}", "value2": "0", "assertMethod": "=="}], "calculator": [{"id": 1, "name": "diamondDet", "Variable1": "{{diamond1}}", "Variable2": "{{diamond2}}", "calFunction": "subtract"}], "extractor": [{"id": 4, "name": "CODE", "value": "code", "condition": ""}, {"id": 5, "name": "diamond2", "value": "data.currencyList.1.count", "condition": ""}, {"id": 14, "name": "doudou2", "value": "data.currencyList.0.count", "condition": "{currencyType:4}"}]}], "assertList": [{"id": 4, "value1": "{{diamondDet}}", "value2": "15", "assertMethod": "="}]}], "name": "购买商城道具", "environment": "TEST", "globalVariable": [{"id": 1, "name": "EZ_uid", "value": "149331354"}]}
 
 
-#  依据路径【path】从字典【dict】中， 有条件的【condition】读取数据， condition 仅在遇到list数据时，传值使用
-#  _str: a.b.c  _dict:{"a":{"b":{"c":"157888"}}},  condition： [{"w":"9"},{"z":11}]
-def get_path_dict_condition(_str: str, _dict: dict, condition: [dict] = None):
-    str_list = _str.split('.', 1)
-    for rel in str_list:
-        if rel == str_list[-1]:
-            return {_str: _dict[rel]}
-        if rel.isdigit():
-            if not condition:
-                return get_path_dict_condition(str_list[1], _dict[int(rel)], condition)
-            keys = list(condition[0].keys())
-            for dic in _dict:
-                if condition[0][keys[0]] == dic[keys[0]]:
-                    del condition[0]
-                    return get_path_dict_condition(str_list[1], dic, condition)
-            return {_str: None}
-        if rel in _dict.keys():
-            return get_path_dict_condition(str_list[1], _dict[rel], condition)
-        return {_str: None}
-
-
-# 针对性函数，将字符串类型的condition，转换成list[dict]  例如'{"a":1}, {"b":"user"}' --> [{"a":1}， {"b":"user"}]
-def get_condition(condition):
-    condition_list = []
-    if not condition: return None
-    condition_split = condition.split(",")
-    for cond in condition_split:
-        condition_list.append(
-            json.loads(cond)
-        )
-    return condition_list
+host = ""

@@ -30,6 +30,7 @@ ALLOWED_HOSTS = ["192.168.17.32", "0.0.0.0"]
 INSTALLED_APPS = [
     "import_export",
     "django_json_widget",
+    "fieldsets_with_inlines",
     "case_plan.apps.CaseplanConfig",
     'django.contrib.admin',
     'django.contrib.auth',
@@ -37,8 +38,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    "django_simple_tags"
 
-    "django_simple_tags",
+    # "django_admin_filter",
+    # "inline_orderable",
     # "django_admin_json_editor",
     # "prettyjson",
     # "grappelli",
@@ -57,10 +60,10 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware'
 ]
 
-ROOT_URLCONF = 'interface_test_platform.urls'
+ROOT_URLCONF = 'platformApp.urls'
 STATIC_ROOT = "./templates"
 TEMPLATES = [
     {
@@ -79,7 +82,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'interface_test_platform.wsgi.application'
+WSGI_APPLICATION = 'platformApp.wsgi.application'
 
 # Database 默认配置
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases

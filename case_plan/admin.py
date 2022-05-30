@@ -4,6 +4,7 @@ from django.contrib import admin
 # Register your models here.
 from django.db.models import JSONField
 from django_json_widget.widgets import JSONEditorWidget
+from fieldsets_with_inlines import FieldsetsInlineMixin
 from import_export import resources
 from import_export.admin import ImportExportModelAdmin
 from import_export.formats import base_formats
@@ -11,7 +12,7 @@ from .models import *
 
 
 
-class publicAdmin(ImportExportModelAdmin):
+class publicAdmin(FieldsetsInlineMixin, ImportExportModelAdmin):
 
 
     list_display = ["id", 'name', "created_time", "updated_time"]  # 展示字段
@@ -27,7 +28,7 @@ class publicAdmin(ImportExportModelAdmin):
         JSONField: {'widget': JSONEditorWidget},
     }
 
-    def save_model(self, request, obj:step, form, change):  # 自动保存修改和创建人
+    def save_model(self, request, obj:stepModel, form, change):  # 自动保存修改和创建人
         if not change:
             obj.create_user = request.user.username
         obj.update_user = request.user.username
@@ -49,9 +50,10 @@ class publicAdmin(ImportExportModelAdmin):
         return [f for f in formats if f().can_export()]
 
 
+
 class stepResources(resources.ModelResource):
     class Meta:
-        model = step
+        model = stepModel
 
 
 class publicLine(admin.TabularInline):
@@ -59,20 +61,20 @@ class publicLine(admin.TabularInline):
 
 
 class calculateLine(publicLine):
-    model = calculater
+    model = calculaterModel
 
 
-class responseLine(publicLine):
-    model = response
+class extractorLine(publicLine):
+    model = extractorModel
 
 
 class assertLine(publicLine):
-    model = asserts
+    model = assertsModel
 
 
 
 class variableLine(publicLine):
-    model = variable
+    model = variableModel
 
 
 class caseAssertLine(assertLine):
@@ -85,27 +87,23 @@ class caseVariableLine(variableLine):
     classes = ["collapse"]
 
 
-
-
-
-
 class stepLine(publicLine):
-    model = step
+    model = stepModel
     sortable_field_name = "stepNumber"
 
 
-@admin.register(variable)
-class variableAdmin(publicAdmin):
-    list_display = ("id", 'name', 'value')
+# @admin.register(variable)
+# class variableAdmin(publicAdmin):
+#     list_display = ("id", 'name', 'value')
+#
 
 
 
 
-
-@admin.register(onStep)
-class onStepAdmin(publicAdmin):
+@admin.register(requestInfoModel)
+class requestInfoAdmin(publicAdmin):
     list_display = ("id", 'name', 'path', 'params')
-    fieldsets = [
+    fieldsets_with_inlines = [
         (None, {'fields': ['name']}),
         ('基本信息', {'fields': ["host","path",]}),
         ("参数集", {"fields": ["params"]}),
@@ -114,15 +112,15 @@ class onStepAdmin(publicAdmin):
 
 
 
-@admin.register(step)
+@admin.register(stepModel)
 class stepAdmin(publicAdmin):
-    fieldsets = [
+    fieldsets_with_inlines = [
         (None, {'fields': ['name']}),
-        ('基本信息', {'fields': ["onStep","stepNumber",]}),
-
-        ('替换参数', {'fields': ["params",], "classes":["collapse", ]})
+        ('基本信息', {'fields': ["requestInfo","stepNumber",]}),
+        ('替换参数', {'fields': ["params",], "classes":["collapse", ]}),
+        extractorLine, calculateLine, assertLine
     ]
-    inlines = [responseLine, calculateLine, assertLine]
+    inlines = []
     list_display = ("id","stepNumber", 'name',"create_user", "update_user", "created_time", "updated_time")
 
 
@@ -130,55 +128,54 @@ class stepAdmin(publicAdmin):
     autocomplete_fields = []
 
 
-@admin.register(case)
+@admin.register(caseModel)
 class caseAdmin(publicAdmin):
     @staticmethod
-    def step_str(obj:case):
+    def step_str(obj:caseModel):
         return [rel for rel in obj.step.all()]
 
     list_display = ("id", 'name', "step_str","create_user","update_user","created_time", "updated_time")
     filter_horizontal = ["step", ]
-    fieldsets = [
+    fieldsets_with_inlines = [
         (None, {'fields': ['name']}),
-        ('用例步骤列表', {'fields': ["step",]})
+        caseVariableLine,
+        ('用例步骤列表', {'fields': ["step",]}),
+        caseAssertLine,
     ]
-
-    inlines = [caseVariableLine, caseAssertLine]
     ordering = ["name"]
 
 
-@admin.register(plan)
+@admin.register(planModel)
 class planAdmin(publicAdmin):
 
     @staticmethod
     def case_list_str(obj):
         return [rel for rel in obj.case.all().order_by("name")]
 
-
     @staticmethod
     def val_list_str(obj):
         return [rel for rel in obj.variable.all().order_by("name")]
 
-    fieldsets = [
+    fieldsets_with_inlines = [
         (None, {'fields': ['name']}),
         ('基本信息', {'fields': ["environment", "app_type", "case"]}),
+        variableLine
     ]
-    inlines = [variableLine]
 
     list_display = ("id", 'name', "case_list_str", "val_list_str","create_user","update_user","created_time", "updated_time")
     autocomplete_fields = ["case", ]
 
 
-@admin.register(asserts)
-class assertAdmin(publicAdmin):
-    pass
+# @admin.register(asserts)
+# class assertAdmin(publicAdmin):
+#     pass
+#
+#
+# @admin.register(extractor)
+# class extractorAdmin(publicAdmin):
+#     pass
+#
 
-
-@admin.register(response)
-class responseAdmin(publicAdmin):
-    pass
-
-
-@admin.register(calculater)
-class calculateAdmin(publicAdmin):
-    pass
+# @admin.register(calculater)
+# class calculateAdmin(publicAdmin):
+#     pass
