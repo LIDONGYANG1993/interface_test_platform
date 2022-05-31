@@ -23,7 +23,7 @@ SECRET_KEY = 'django-insecure-hbetbnyfrfe@*cyb^i5#m08sbpxcby6-_9b(c--3inju^neiu1
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["192.168.17.32", "0.0.0.0"]
+ALLOWED_HOSTS = ["192.168.17.32", "0.0.0.0", "1.116.254.250"]
 
 # Application definition
 
@@ -39,15 +39,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     "django_simple_tags"
-
-    # "django_admin_filter",
-    # "inline_orderable",
-    # "django_admin_json_editor",
-    # "prettyjson",
-    # "grappelli",
-    # "bootstrap_form_horizontal",
-    # "django_horizontal_list_filter",
-    # "django_jsonfield_widget",
 ]
 
 MIDDLEWARE_CLASSES = [
