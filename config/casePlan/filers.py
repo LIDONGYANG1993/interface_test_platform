@@ -135,6 +135,7 @@ class requestInfoFiler:
 
     headers = "headers"
     data = "data"
+    result = "result"
 
     step = "step"
     dataId = "id"
@@ -185,11 +186,21 @@ class calculatorFiler:
 
     used = [name, Variable1, Variable2, calFunction, step]
 
+    result = "result"
 
     isUse = "isUse"
     dataId = "id"
     createTime = "createTime"
     updateTime = "updateTime"
+
+class configFiler:
+    name = "name"  # 提取器存储名称，
+    value = "value"  # 变量1
+    isUse = "isUse"
+    dataId = "id"
+    createTime = "createTime"
+    updateTime = "updateTime"
+
 
 
 class assertsFiler:
@@ -202,13 +213,12 @@ class assertsFiler:
     used = [value1, assertMethod, value2, step, case]
 
     result = "result"
+    assertStr = "assertStr"
 
     isUse = "isUse"
     dataId = "id"
     createTime = "createTime"
     updateTime = "updateTime"
-
-
 
 
 

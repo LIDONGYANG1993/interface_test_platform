@@ -15,8 +15,10 @@ from .models import *
 class publicAdmin(FieldsetsInlineMixin, ImportExportModelAdmin):
 
 
+
+
     list_display = ["id", 'name', "created_time", "updated_time"]  # 展示字段
-    list_display_links = ["id", "name"]  # 展示字段链接
+    list_display_links = ["id", "name"]  # 展示字段链
     readonly_fields = ["created_time", "updated_time"]
     search_fields = ["name", "id"]  # 搜索字段
     empty_value_display = '无'  # 默认空值展示字段
@@ -99,13 +101,19 @@ class stepLine(publicLine):
 
 
 
+@admin.register(defaultModel)
+class defaultAdmin(publicAdmin):
+    fieldsets_with_inlines = [
+        (None, {'fields': ['name']}),
+        (None, {'fields': ["value",]})
+    ]
 
 @admin.register(requestInfoModel)
 class requestInfoAdmin(publicAdmin):
     list_display = ("id", 'name', 'path', 'params')
     fieldsets_with_inlines = [
         (None, {'fields': ['name']}),
-        ('基本信息', {'fields': ["host","path",]}),
+        ('基本信息', {'fields': ["host","path","headers"]}),
         ("参数集", {"fields": ["params"]}),
     ]
 
@@ -158,19 +166,32 @@ class planAdmin(publicAdmin):
 
     fieldsets_with_inlines = [
         (None, {'fields': ['name']}),
-        ('基本信息', {'fields': ["environment", "app_type", "case"]}),
+        ('基本信息', {'fields': ["environment_and_type","case"]}),
         variableLine
     ]
 
-    list_display = ("id", 'name', "case_list_str", "val_list_str","create_user","update_user","created_time", "updated_time")
+    list_display = ("id", 'name', "case_list_str", "val_list_str","create_user","update_user","environment_and_type","created_time", "updated_time")
     autocomplete_fields = ["case", ]
 
+@admin.register(tokenModel)
+class tokenAdmin(publicAdmin):
+    list_display = ["uid","token"]
+    list_display_links = ["uid","token"]
+    fieldsets_with_inlines = [
+        (None, {'fields': ['uid']}),
+        (None, {'fields': ["token",]})
+    ]
 
-# @admin.register(asserts)
-# class assertAdmin(publicAdmin):
-#     pass
-#
-#
+
+@admin.register(assertsModel)
+class assertAdmin(publicAdmin):
+    list_display = ("id", 'name',"func","name_another")
+    fieldsets_with_inlines = [
+        (None, {'fields': ['name']}),
+        (None, {'fields': ["func", "name_another"]})
+    ]
+
+
 # @admin.register(extractor)
 # class extractorAdmin(publicAdmin):
 #     pass

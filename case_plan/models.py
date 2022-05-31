@@ -65,6 +65,13 @@ class publicModel(models.Model):
     def get_related_name_update_user(self):
         return self.related_name + "update_user"
 
+class defaultModel(publicModel):
+    related_name = "default"
+    name = models.CharField(configReplace[configFiler.name], max_length=100, default="environment", blank=False)
+    value = models.JSONField(configReplace[configFiler.value], max_length=500, default=dict, blank=True)
+
+    def __str__(self):
+        return "{}".format(self.name)
 
 class variableModel(publicModel):
     related_name = "variable"
@@ -87,7 +94,7 @@ class extractorModel(publicModel):
     related_name = "extractor"
     step = models.ForeignKey("stepModel", verbose_name=extractorReplace[extractorFiler.step], unique=False,
                              on_delete=models.CASCADE, blank=False, editable=False, null=True)
-    name = models.CharField(extractorReplace[extractorFiler.name], max_length=100, default="code_0", blank=False)
+    name = models.CharField(extractorReplace[extractorFiler.name], max_length=100, default="CODE", blank=False)
     value = models.CharField(extractorReplace[extractorFiler.value], max_length=100, default="code", blank=False)
     condition = models.CharField(extractorReplace[extractorFiler.condition], max_length=100, default="", blank=True)
     forDefault = models.CharField("无意义字段【忽略】", max_length=1, default=0, blank=True)  # 该字段无意义，仅为掩盖Djongo的默认不保存缺陷而建立
@@ -146,7 +153,9 @@ class requestInfoModel(publicModel):
     method = models.CharField(requestInfoReplace[requestInfoFiler.method], max_length=5,
                               choices=publicModel.methodTypeChoices.choices,
                               default=publicModel.methodTypeChoices.POST)  # 步骤方法,应隶属步骤类型
+    headers = models.JSONField(requestInfoReplace[requestInfoFiler.host], max_length=500, default=dict, blank=True)
     params = models.JSONField(requestInfoReplace[requestInfoFiler.params], max_length=500, default=dict, blank=True)
+
 
     class Meta:
         verbose_name = "接口与参数"
@@ -191,12 +200,7 @@ class planModel(publicModel):
     related_name = "plan"
 
     name = models.CharField(planReplace[planFiler.name], max_length=500, default=None, blank=False)
-    environment = models.CharField(planReplace[planFiler.environment], max_length=5,
-                                   choices=publicModel.environmentTextChoices.choices,
-                                   default=publicModel.environmentTextChoices.TEST)
-    app_type = models.CharField(planReplace[planFiler.appType], max_length=5,
-                                choices=publicModel.appTypeTextChoices.choices,
-                                default=publicModel.appTypeTextChoices.MAIN)
+    environment_and_type = models.ForeignKey("defaultModel", on_delete=models.SET_NULL, null=True, verbose_name=planReplace[planFiler.environment], max_length=5, default=1)
     case = models.ManyToManyField(caseModel, verbose_name=planReplace[planFiler.caseList], default=None, blank=True)
 
     class Meta:
@@ -205,3 +209,12 @@ class planModel(publicModel):
 
     def __str__(self):
         return "{}".format(self.name)
+
+
+class tokenModel(publicModel):
+    related_name = "token"
+    uid = models.CharField(max_length=100, default=None, blank=False)
+    environment = models.CharField(max_length=100, default=None, blank=True, null=True)
+    app_type = models.CharField(max_length=100, default=None, blank=True, null=True)
+    token = models.JSONField(max_length=100, default=None, blank=True, null=True)
+

@@ -98,3 +98,11 @@ assertsReplace = {
     assertsFiler.isUse: "是否可用",
     assertsFiler.dataId: "编号",
 }
+
+configReplace = {
+
+    configFiler.name: "配置参数名称",
+    configFiler.value: "配置值",
+    configFiler.isUse: "是否可用",
+    configFiler.dataId: "编号",
+}

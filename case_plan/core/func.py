@@ -7,11 +7,14 @@ import json
 
 #  依据路径【path】从字典【dict】中， 有条件的【condition】读取数据， condition 仅在遇到list数据时，传值使用
 #  _str: a.b.c  _dict:{"a":{"b":{"c":"157888"}}},  condition： [{"w":"9"},{"z":11}]
+import time
+
+
 def get_path_dict_condition(_str: str, _dict: dict, condition: [dict] = None):
     str_list = _str.split('.', 1)
     for rel in str_list:
         if rel == str_list[-1]:
-            return {_str: _dict[rel]}
+            return _dict[rel]
         if rel.isdigit():
             if not condition:
                 return get_path_dict_condition(str_list[1], _dict[int(rel)], condition)
@@ -20,10 +23,10 @@ def get_path_dict_condition(_str: str, _dict: dict, condition: [dict] = None):
                 if condition[0][keys[0]] == dic[keys[0]]:
                     del condition[0]
                     return get_path_dict_condition(str_list[1], dic, condition)
-            return {_str: None}
+            return None
         if rel in _dict.keys():
             return get_path_dict_condition(str_list[1], _dict[rel], condition)
-        return {_str: None}
+        return None
 
 
 # 针对性函数，将字符串类型的condition，转换成list[dict]  例如'{"a":1}, {"b":"user"}' --> [{"a":1}， {"b":"user"}]
@@ -36,6 +39,22 @@ def get_condition(condition):
             json.loads(cond)
         )
     return condition_list
+
+
+def is_number(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        pass
+    try:
+        import unicodedata
+        unicodedata.numeric(s)
+        return True
+    except (TypeError, ValueError):
+        pass
+
+    return False
 
 
 # 基本计算器
