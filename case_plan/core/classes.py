@@ -676,7 +676,7 @@ class caseDone(publicDone):
             step: stepDone
             if self.fail:return
             the_logger.debug("START-STEP, {}-{} ".format(step.stepNumber, step.name))
-            self._thread_run_join(step.run_in_step),time.sleep(2)
+            self._thread_run_join(step.run_in_step),time.sleep(0)
             the_logger.debug("END-STEP, {}-{} ".format(step.stepNumber, step.name))
             self.extractor_result.update(step.extractor_result)
             self.calculater_result.update(step.calculator_result)

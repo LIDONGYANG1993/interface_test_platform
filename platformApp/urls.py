@@ -16,7 +16,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.conf.urls import include
+from case_plan import views
+
 urlpatterns = [
     path('admin/', admin.site.urls),
-    # path('xadmin/', admin.site.urls),
+    path('run/case', views.run_case_by_id),
+    path('run/requestInfo', views.run_request_by_id),
+    path('run/plan', views.run_plan_by_id),
+    path('run/step', views.run_step_by_id),
 ]
