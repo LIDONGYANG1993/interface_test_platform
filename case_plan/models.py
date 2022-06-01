@@ -159,7 +159,7 @@ class requestInfoModel(publicModel):
 
     class Meta:
         verbose_name = "接口与参数"
-        verbose_name_plural = "接口与具体参数"
+        verbose_name_plural = "004-接口与参数"
 
     def __str__(self):
         return "{}： {}".format(self.name, self.path)
