@@ -113,7 +113,7 @@ class requestInfoAdmin(publicAdmin):
     list_display = ("id", 'name', 'path', 'params')
     fieldsets_with_inlines = [
         (None, {'fields': ['name']}),
-        ('基本信息', {'fields': ["host","path","headers"]}),
+        ('基本信息', {'fields': ["host","path"]}),
         ("参数集", {"fields": ["params"]}),
     ]
 

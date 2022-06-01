@@ -51,6 +51,7 @@ requestInfoReplace= {
     requestInfoFiler.path: "接口请求路径",
     requestInfoFiler.host: "接口请求host",
     requestInfoFiler.params: "默认参数",
+    requestInfoFiler.headers: "headers",
     stepFiler.dataId: "编号"
 }
 

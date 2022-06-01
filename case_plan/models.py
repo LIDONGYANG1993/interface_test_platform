@@ -153,7 +153,7 @@ class requestInfoModel(publicModel):
     method = models.CharField(requestInfoReplace[requestInfoFiler.method], max_length=5,
                               choices=publicModel.methodTypeChoices.choices,
                               default=publicModel.methodTypeChoices.POST)  # 步骤方法,应隶属步骤类型
-    headers = models.JSONField(requestInfoReplace[requestInfoFiler.host], max_length=500, default=dict, blank=True)
+    headers = models.JSONField(requestInfoReplace[requestInfoFiler.headers], max_length=500, default=dict, blank=True)
     params = models.JSONField(requestInfoReplace[requestInfoFiler.params], max_length=500, default=dict, blank=True)
 
 
