@@ -381,7 +381,8 @@ class requestDone(publicDone):
 
     def asserts(self):
         self.response: requests.Response
-        if self.response.status_code != 200:
+
+        if  not self.response or self.response.status_code != 200:
             self.error = True
             self.code = self.response.status_code
             self.response_json = None
