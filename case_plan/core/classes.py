@@ -382,7 +382,12 @@ class requestDone(publicDone):
     def asserts(self):
         self.response: requests.Response
 
-        if not self.response or self.response.status_code != 200:
+        if not self.response:
+            self.error = True
+            self.code = 99999
+            self.response_json = None
+
+        elif self.response.status_code != 200:
             self.error = True
             self.code = self.response.status_code
             self.response_json = None
@@ -722,8 +727,10 @@ class caseDone(publicDone):
             step: stepDone
             if not (step.error is False):
                 msg = msg + "步骤：{}-{},执行异常！\n".format(step.stepNumber, step.name)
+                break
             elif not (step.fail is False):
                 msg = msg + "步骤：{}-{},执行失败！\n".format(step.stepNumber, step.name)
+                break
             else:
                 msg = msg + "步骤：{}-{},执行成功！\n".format(step.stepNumber, step.name)
         for asserts in self.asserts_list:
@@ -798,6 +805,7 @@ class planDone(publicDone):
             case: caseDone
             if not (case.fail is False):
                 msg = msg + "用例：{},执行失败！\n".format(case.name)
+                break
             else:
                 msg = msg + "用例：{},执行成功！\n".format(case.name)
         return msg
