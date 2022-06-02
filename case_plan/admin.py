@@ -11,7 +11,9 @@ from import_export.formats import base_formats
 from .models import *
 
 
-
+admin.site.site_title = "接口场景化平台"
+admin.site.site_header = "接口场景化平台"
+admin.site.index_title = "接口场景化平台"
 class publicAdmin(FieldsetsInlineMixin, ImportExportModelAdmin):
 
 
