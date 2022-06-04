@@ -196,6 +196,11 @@ class caseModel(publicModel):
         return "{}".format(self.name)
 
 
+    def step_str(self):
+        return [rel for rel in self.step.all()]
+
+    step_str.short_description = "步骤"
+
 class planModel(publicModel):
     related_name = "plan"
 
@@ -210,6 +215,15 @@ class planModel(publicModel):
     def __str__(self):
         return "{}".format(self.name)
 
+
+    def val_list_str(self):
+        return [rel for rel in self.variable.all().order_by("name")]
+
+    def case_list_str(self):
+        return ",\n".join([rel.__str__() for rel in self.case.all().order_by("name")])
+
+    case_list_str.short_description = "用例集合"
+    val_list_str.short_description = "变量集合"
 
 class tokenModel(publicModel):
     related_name = "token"

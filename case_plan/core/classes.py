@@ -295,6 +295,7 @@ class assertsDone(publicDone):
 class requestDone(publicDone):
     def __init__(self, data):
         super().__init__(data)
+        self.msg = None
         self.name = self.get_name
         self.host = self.get_host
         self.path = self.get_path
@@ -404,23 +405,24 @@ class requestDone(publicDone):
             self.asserts()
 
     def result_for_api(self):
+        self.result_massage()
         return {
             requestInfoFiler.name: self.name,
             requestInfoFiler.host: self.host,
             requestInfoFiler.path: self.path,
             requestInfoFiler.params: self.params,
             requestInfoFiler.result: self.response_json,
-            "msg": self.result_massage()
+            "msg": self.msg
 
         }
 
     def result_massage(self):
-        msg = ""
+        msg = []
         if self.error is None or self.error is True:
-            msg = msg + "接口：{},访问失败！\n".format(self.name)
+            msg.append("接口：{},访问失败！\n".format(self.name))
         else:
-            msg = msg + "用例：{},访问成功！\n".format(self.name)
-        return msg
+            msg.append("接口：{},访问成功！\n".format(self.name))
+        self.msg = msg
 
     def make_environment(self):
         environment = self.get_environment()
@@ -463,6 +465,7 @@ class stepDone(publicDone):
 
     def __init__(self, data):
         super().__init__(data)
+        self.msg = None
         self.name = self.get_name
         self.case = self.get_case
         self.stepNumber = self.get_stepNumber
@@ -586,6 +589,7 @@ class stepDone(publicDone):
         self.asserts_in_step()
 
     def result_for_api(self):
+        self.result_massage()
         return {
             stepFiler.name: self.name,
             stepFiler.stepNumber: self.stepNumber,
@@ -593,30 +597,32 @@ class stepDone(publicDone):
             stepFiler.extractor: self.extractor_result,
             stepFiler.calculator: self.calculator_result_for_api,
             stepFiler.assertList: self.asserts_result_for_api,
-            "msg": self.result_massage()
+            "msg": self.msg
 
         }
 
     def result_massage(self):
-        msg = ""
+        msg = []
         if self.error:
-            msg = msg + "步骤：{},执行异常！\n".format(self.name)
+            msg.append("步骤：{},执行异常！\n".format(self.name))
         elif self.fail is None or self.fail is True:
-            msg = msg + "步骤：{},执行失败！\n".format(self.name)
+            msg.append("步骤：{},执行失败！\n".format(self.name))
         else:
-            msg = msg + "步骤：{},执行成功！\n".format(self.name)
+            msg.append("步骤：{},执行成功！\n".format(self.name))
         for asserts in self.asserts_list:
             if not asserts.asserts_result:
-                msg = msg + "验证：{},验证失败！\n".format(asserts.asserts_str)
+                msg.append("验证：{},验证失败！\n".format(asserts.asserts_str))
                 break
             else:
-                msg = msg + "验证：{}, 验证成功！\n".format(asserts.asserts_str)
-        return msg
+                msg.append( "验证：{}, 验证成功！\n".format(asserts.asserts_str))
+        self.msg = msg
+
 
 
 class caseDone(publicDone):
     def __init__(self, data):
         super().__init__(data)
+        self.msg = None
         self.name = self.get_name
         self.plan = self.get_plan
         self.variable = self.get_variable
@@ -682,11 +688,11 @@ class caseDone(publicDone):
             the_logger.debug("START-ASSERT-CASE: {} ".format(asserts.asserts_str))
             self._thread_run_join(asserts.get_result)
             the_logger.debug("END-ASSERT-CASE: {}--{}".format(asserts.asserts_str, asserts.asserts_result))
-            if not asserts.asserts_result:
-                self.fail = True
             self.asserts_result.append(
                 {assertsFiler.assertStr: asserts.asserts_str, assertsFiler.result: asserts.result})
             self.asserts_result_for_api.append(asserts.asserts_result_for_api())
+            if not asserts.asserts_result:
+                self.fail = True
 
     def update_variable(self):
         self.variable.update(self.plan.variable)
@@ -702,6 +708,7 @@ class caseDone(publicDone):
             self.calculater_result.update(step.calculator_result)
             self.step_result_for_api.append(step.result_for_api())
             if not (step.error is False) or not (step.fail is False): self.fail = True
+            else:self.fail = False
         self.asserts_in_case()
 
     def get_replace_result(self):
@@ -714,34 +721,33 @@ class caseDone(publicDone):
         self.replace_result.update(self.calculater_result)
 
     def result_for_api(self):
+        self.result_massage()
         return {
             caseFiler.name: self.name,
             caseFiler.stepList: self.step_result_for_api,
             caseFiler.assertList: self.asserts_result_for_api,
-            "msg": self.result_massage()
+            "msg": self.msg
         }
 
     def result_massage(self):
-        msg = ""
+        msg = []
         for step in self.step_list:
             step: stepDone
             if not (step.error is False):
-                msg = msg + "步骤：{}-{},执行异常！\n".format(step.stepNumber, step.name)
+                msg.append( "步骤：{}-{},执行异常！\n".format(step.stepNumber, step.name))
                 break
             elif not (step.fail is False):
-                msg = msg + "步骤：{}-{},执行失败！\n".format(step.stepNumber, step.name)
+                msg.append("步骤：{}-{},执行失败！\n".format(step.stepNumber, step.name))
                 break
             else:
-                msg = msg + "步骤：{}-{},执行成功！\n".format(step.stepNumber, step.name)
+                msg.append("步骤：{}-{},执行成功！\n".format(step.stepNumber, step.name))
         for asserts in self.asserts_list:
             if not (asserts.fail is False):
-                msg = msg + "验证：{},验证失败！\n".format(asserts.asserts_str)
+                msg.append("验证：{},验证失败！\n".format(asserts.asserts_str))
                 break
             else:
-                msg = msg + "验证：{}, 验证成功！\n".format(asserts.asserts_str)
-
-        return msg
-
+                msg.append("验证：{}, 验证成功！\n".format(asserts.asserts_str))
+        self.msg = msg
 
 class planDone(publicDone):
     def __init__(self, data):
@@ -754,6 +760,9 @@ class planDone(publicDone):
         self.replace_result = {}
         self.case_result_for_api = []
         self.case_list = self.get_case_list
+
+        self.msg = None
+
 
     @property
     def get_variable(self):
@@ -775,6 +784,7 @@ class planDone(publicDone):
 
     def run_in_plan(self):
         the_logger.debug("START-PLAN")
+
         for case in self.case_list:
             case: caseDone
 
@@ -791,24 +801,24 @@ class planDone(publicDone):
         self.replace_result.update(self.extractor_result)
 
     def result_for_api(self):
+        self.result_massage()
         return {
             planFiler.name: self.name,
             planFiler.environment: self.environment,
             planFiler.caseList: self.case_result_for_api,
-            "msg": self.result_massage()
+            "msg":self.msg
 
         }
 
     def result_massage(self):
-        msg = ""
+        msg = []
         for case in self.case_list:
             case: caseDone
             if not (case.fail is False):
-                msg = msg + "用例：{},执行失败！\n".format(case.name)
-                break
+                msg.append("用例：{},执行失败！\n".format(case.name))
             else:
-                msg = msg + "用例：{},执行成功！\n".format(case.name)
-        return msg
+                msg.append("用例：{},执行成功！\n".format(case.name))
+        self.msg = msg
 
     def variable_dict(self):
         res = {}

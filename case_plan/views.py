@@ -14,7 +14,7 @@ def run_case_by_id(request):
     data_id = data.get("data_id", None)
     if not data_id:
         return JsonResponse(response.params_error)
-    result.update(run_case(data_id))
+    result.update({"data":run_case(data_id)})
     return JsonResponse(result)
 
 
@@ -26,7 +26,7 @@ def run_request_by_id(request):
     data_id = data.get("data_id", None)
     if not data_id:
         return JsonResponse(response.params_error)
-    result.update(run_requestInfo(data_id))
+    result.update({"data":run_requestInfo(data_id)})
     return JsonResponse(result)
 
 def run_plan_by_id(request):
@@ -36,7 +36,7 @@ def run_plan_by_id(request):
     data_id = data.get("data_id", None)
     if not data_id:
         return JsonResponse(response.params_error)
-    result.update(run_plan(data_id))
+    result.update({"data":run_plan(data_id)})
     return JsonResponse(result)
 
 def run_step_by_id(request):
@@ -46,5 +46,5 @@ def run_step_by_id(request):
     data_id = data.get("data_id", None)
     if not data_id:
         return JsonResponse(response.params_error)
-    result.update(run_step(data_id))
+    result.update({"data":run_step(data_id)})
     return JsonResponse(result)
