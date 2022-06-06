@@ -13,7 +13,7 @@ import requests
 from requests import Response
 from config.casePlan.yamlFilersZh import *
 from case_plan.core.func import *
-
+from case_plan.models import publicModel
 from config.logger import Logger, project_path
 
 asserts_used = []
@@ -166,13 +166,13 @@ class calculaterDone(publicDone):
 
         variable1 = float(self.variable1)
         variable2 = float(self.variable2)
-        if self.calFunction == "add":
+        if self.calFunction == publicModel.calChoices.ADD:
             return cal.add(variable1, variable2)
-        if self.calFunction == "subtract":
+        if self.calFunction == publicModel.calChoices.SUB:
             return cal.subtract(variable1, variable2)
-        if self.calFunction == "multiply":
+        if self.calFunction == publicModel.calChoices.MULT:
             return cal.multiply(variable1, variable2)
-        if self.calFunction == "divide":
+        if self.calFunction == publicModel.calChoices.DIV:
             return cal.divide(variable1, variable2)
         return None
 

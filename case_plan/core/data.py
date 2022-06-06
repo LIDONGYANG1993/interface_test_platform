@@ -297,7 +297,7 @@ class tokenData(publicData):
     model_data: tokenModel
     model: tokenModel
 
-    def __init__(self,uid, app_type, environment ):
+    def __init__(self,uid, app_type, environment):
         super().__init__(tokenModel)
         self.model_data = self.get_by_filed(uid, app_type, environment)
 
