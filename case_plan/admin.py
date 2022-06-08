@@ -97,6 +97,10 @@ class requestInfoAdmin(publicAdmin):
     ]
     search_fields = ["name", "id", "path"]
 
+    formfield_overrides = {
+        JSONField: {'widget': JSONEditorWidget(height=350)},
+    }
+
 
 @admin.register(stepModel)
 class stepAdmin(publicAdmin):
