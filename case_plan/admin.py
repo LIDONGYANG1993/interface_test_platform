@@ -153,30 +153,30 @@ class planAdmin(publicAdmin):
 #         (None, {'fields': ["token",]})
 #     ]
 
-#
-# @admin.register(assertsModel)
-# class assertAdmin(publicAdmin):
-#     list_display = ("id", 'name',"func","name_another")
-#     fieldsets_with_inlines = [
-#         (None, {'fields': ['name']}),
-#         (None, {'fields': ["func", "name_another"]})
-#     ]
+
+@admin.register(assertsModel)
+class assertAdmin(publicAdmin):
+    list_display = ("id", 'name',"func","name_another")
+    fieldsets_with_inlines = [
+        (None, {'fields': ['name']}),
+        (None, {'fields': ["func", "name_another"]})
+    ]
 
 
-# @admin.register(extractor)
-# class extractorAdmin(publicAdmin):
-#     pass
-#
-
-# @admin.register(calculater)
-# class calculateAdmin(publicAdmin):
-#     pass
+@admin.register(extractorModel)
+class extractorAdmin(publicAdmin):
+    list_display = ("id", 'name', 'value', "condition")
 
 
-# @admin.register(variable)
-# class variableAdmin(publicAdmin):
-#     list_display = ("id", 'name', 'value')
-#
+@admin.register(calculaterModel)
+class calculateAdmin(publicAdmin):
+    list_display = ("id", 'name', 'value1', "func", "value2")
+
+
+@admin.register(variableModel)
+class variableAdmin(publicAdmin):
+    list_display = ("id", 'name', 'value')
+
 
 
 # @admin.register(defaultModel)
