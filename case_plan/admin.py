@@ -166,16 +166,28 @@ class assertAdmin(publicAdmin):
 @admin.register(extractorModel)
 class extractorAdmin(publicAdmin):
     list_display = ("id", 'name', 'value', "condition")
+    fieldsets_with_inlines = [
+        (None, {'fields': ['name']}),
+        (None, {'fields': ["value", "condition"]})
+    ]
 
 
 @admin.register(calculaterModel)
 class calculateAdmin(publicAdmin):
     list_display = ("id", 'name', 'value1', "func", "value2")
+    fieldsets_with_inlines = [
+        (None, {'fields': ['name']}),
+        (None, {'fields': ["value1", "func", "value2"]})
+    ]
 
 
 @admin.register(variableModel)
 class variableAdmin(publicAdmin):
     list_display = ("id", 'name', 'value')
+    fieldsets_with_inlines = [
+        (None, {'fields': ['name']}),
+        (None, {'fields': ["value"]})
+    ]
 
 
 
