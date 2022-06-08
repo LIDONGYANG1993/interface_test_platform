@@ -28,7 +28,8 @@ ALLOWED_HOSTS = ["192.168.17.32", "0.0.0.0", "1.116.254.250", "101.200.239.26"]
 # Application definition
 
 INSTALLED_APPS = [
-    # "simpleui",
+    "simpleui",
+    "inline_actions",
     "import_export",
     "django_json_widget",
     "fieldsets_with_inlines",

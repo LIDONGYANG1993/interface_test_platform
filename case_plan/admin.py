@@ -1,19 +1,26 @@
 from django import forms, db
 from django.contrib import admin
-
+from django.utils.translation import gettext_lazy as _
 # Register your models here.
 from django.db.models import JSONField
+from django.urls import reverse
 from django_json_widget.widgets import JSONEditorWidget
 from fieldsets_with_inlines import FieldsetsInlineMixin
 from import_export import resources
 from import_export.admin import ImportExportModelAdmin
 from import_export.formats import base_formats
+
 from .models import *
+from inline_actions.admin import InlineActionsMixin
+from inline_actions.admin import InlineActionsModelAdminMixin
+from inline_actions.actions import DefaultActionsMixin
+from django.shortcuts import redirect
+
 
 admin.site.site_title = "接口场景化平台"
 admin.site.site_header = "接口场景化平台"
 admin.site.index_title = "接口场景化平台"
-class publicAdmin(FieldsetsInlineMixin, ImportExportModelAdmin):
+class publicAdmin(FieldsetsInlineMixin, InlineActionsModelAdminMixin, ImportExportModelAdmin):
     list_display = ["id", 'name', "created_time", "updated_time"]  # 展示字段
     list_display_links = ["id", "name"]  # 展示字段链
     readonly_fields = ["created_time", "updated_time"]
@@ -81,7 +88,7 @@ class caseAssertLine(assertLine):
 
 
 class caseVariableLine(variableLine):
-    verbose_name = "用例变量"
+    verbose_name_plural = "用例变量"
     classes = ["collapse"]
 
 
@@ -89,7 +96,10 @@ class stepLine(publicLine):
     model = stepModel
     sortable_field_name = "stepNumber"
 
-
+class stepTestLine(InlineActionsMixin, DefaultActionsMixin, publicLine):
+    model = stepModel_test
+    exclude = ["params", ]
+    sortable_field_name = "stepNumber"
 
 @admin.register(requestInfoModel)
 class requestInfoAdmin(publicAdmin):
@@ -105,6 +115,7 @@ class requestInfoAdmin(publicAdmin):
 
 @admin.register(stepModel)
 class stepAdmin(publicAdmin):
+
     fieldsets_with_inlines = [
         (None, {'fields': ['name']}),
         ('基本信息', {'fields': ["requestInfo","stepNumber",]}),
@@ -112,9 +123,24 @@ class stepAdmin(publicAdmin):
         extractorLine, calculateLine, assertLine
     ]
     inlines = []
-    list_display = ("id","stepNumber", 'name',"create_user", "update_user", "created_time", "updated_time")
+    list_display = ("id","stepNumber", 'name',"case_str","create_user", "update_user", "created_time", "updated_time")
+    search_fields = ["name", "id", "case__name"]
 
+    autocomplete_fields = []
 
+@admin.register(stepModel_test)
+class stepTestAdmin(publicAdmin):
+
+    fieldsets_with_inlines = [
+        (None, {'fields': ['name']}),
+        ("所属用例", {'fields': ['case']}),
+        ('基本信息', {'fields': ["requestInfo","stepNumber",]}),
+        ('替换参数', {'fields': ["params",], "classes":["collapse", ]}),
+        extractorLine, calculateLine, assertLine
+    ]
+    inlines = []
+    list_display = ("id","stepNumber", 'name',"case_str","create_user", "update_user", "created_time", "updated_time")
+    search_fields = ["name", "id", "case__name"]
 
     autocomplete_fields = []
 
@@ -128,6 +154,7 @@ class caseAdmin(publicAdmin):
         caseVariableLine,
         ('用例步骤列表', {'fields': ["step",]}),
         caseAssertLine,
+        stepTestLine
     ]
     ordering = ["name"]
 
