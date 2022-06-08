@@ -92,9 +92,7 @@ class variableModel(publicModel):
 
 class extractorModel(publicModel):
     related_name = "extractor"
-    step = models.ForeignKey("stepModel", verbose_name=extractorReplace[extractorFiler.step], unique=False,
-                             on_delete=models.CASCADE, blank=False, editable=False, null=True)
-    step_test = models.ForeignKey("stepModel_test", verbose_name=extractorReplace[extractorFiler.step], unique=False,on_delete=models.SET_NULL, blank=False, editable=False, null=True)
+    step = models.ForeignKey("stepModel", verbose_name=extractorReplace[extractorFiler.step], unique=False,on_delete=models.SET_NULL, blank=False, editable=False, null=True)
     name = models.CharField(extractorReplace[extractorFiler.name], max_length=100, default="CODE", blank=False)
     value = models.CharField(extractorReplace[extractorFiler.value], max_length=100, default="code", blank=False)
     condition = models.CharField(extractorReplace[extractorFiler.condition], max_length=100, default="", blank=True)
@@ -111,10 +109,8 @@ class extractorModel(publicModel):
 class assertsModel(publicModel):
     related_name = "asserts"
     name = models.CharField(assertsReplace[assertsFiler.value1], max_length=100, default="{{CODE}}", blank=False)
-    step_test = models.ForeignKey("stepModel_test", verbose_name=assertsReplace[assertsFiler.step], unique=False,
-                             on_delete=models.SET_NULL, blank=True, editable=False, null=True)
-    step = models.ForeignKey("stepModel", verbose_name=assertsReplace[assertsFiler.step], unique=False,
-                             on_delete=models.CASCADE, blank=True, editable=False, null=True)
+
+    step = models.ForeignKey("stepModel", verbose_name=extractorReplace[extractorFiler.step], unique=False,on_delete=models.SET_NULL, blank=False, editable=False, null=True)
     case = models.ForeignKey("caseModel", verbose_name=assertsReplace[assertsFiler.case], unique=False,
                              on_delete=models.CASCADE, blank=True, editable=False, null=True)
     func = models.CharField(assertsReplace[assertsFiler.assertMethod], max_length=5,
@@ -133,7 +129,6 @@ class calculaterModel(publicModel):
     related_name = "calculater"
     name = models.CharField(calculatorReplace[calculatorFiler.name], max_length=100, default="variable0", blank=False)
     step = models.ForeignKey("stepModel", verbose_name=calculatorReplace[calculatorFiler.step], unique=False,on_delete=models.CASCADE)
-    stepTest = models.ForeignKey("stepModel_test", verbose_name=calculatorReplace[calculatorFiler.step], unique=False,on_delete=models.SET_NULL, null=True,editable=False)
     value1 = models.CharField(calculatorReplace[calculatorFiler.Variable1], max_length=100, default="{{variable1}}",
                               blank=False)
     func = models.CharField(calculatorReplace[calculatorFiler.calFunction], max_length=10,
@@ -172,7 +167,8 @@ class stepModel(publicModel):
     name = models.CharField(stepReplace[stepFiler.name], max_length=500, default=None, blank=False)
     requestInfo = models.ForeignKey("requestInfoModel", verbose_name=stepReplace[stepFiler.requestInfo], unique=False,on_delete=models.CASCADE)
     params = models.JSONField(stepReplace[stepFiler.reParams], max_length=500, default=dict, blank=True)
-    stepNumber = models.IntegerField(stepReplace[stepFiler.stepNumber], default=10001, auto_created=True)
+    stepNumber = models.IntegerField(stepReplace[stepFiler.stepNumber], default=1, auto_created=True)
+    case = models.ForeignKey("caseModel", verbose_name=stepReplace[stepFiler.case],related_name="step",default=None, blank=True, on_delete=models.SET_NULL,null=True)
 
     class Meta:
         verbose_name = "测试步骤"
@@ -187,31 +183,10 @@ class stepModel(publicModel):
 
     case_str.short_description = "所属用例"
 
-class stepModel_test(publicModel):
-    name = models.CharField(stepReplace[stepFiler.name], max_length=500, default=None, blank=False)
-    requestInfo = models.ForeignKey("requestInfoModel", verbose_name=stepReplace[stepFiler.requestInfo], unique=False,on_delete=models.CASCADE)
-    params = models.JSONField(stepReplace[stepFiler.reParams], max_length=500, default=dict, blank=True)
-    stepNumber = models.IntegerField(stepReplace[stepFiler.stepNumber], default=10001, auto_created=True)
-    case = models.ForeignKey("caseModel", verbose_name=caseReplace[caseFiler.stepList],related_name="step_test",default=None, blank=True, on_delete=models.SET_NULL,null=True)
-
-
-    class Meta:
-        verbose_name = "测试步骤"
-        verbose_name_plural = "003-接口步骤"
-        ordering = ["stepNumber", "name", "updated_time", "created_time"]
-
-    def __str__(self):
-        return "{}-{}".format(self.stepNumber, self.name)
-
-    def case_str(self):
-        return self.case.name
-
-    case_str.short_description = "所属用例"
-
 class caseModel(publicModel):
     related_name = "case"
     name = models.CharField(caseReplace[caseFiler.name], max_length=500, default=None, blank=False)
-    step = models.ManyToManyField(stepModel, verbose_name=caseReplace[caseFiler.stepList],related_name="case",default=None, blank=True)
+    model = models.CharField(caseReplace[caseFiler.model], max_length=100, default=None, blank=True)
 
     class Meta:
         verbose_name = "测试用例"

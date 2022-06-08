@@ -24,6 +24,7 @@ caseReplace = {
     caseFiler.name: "用例名称",
     caseFiler.variable: "局部变量",
     caseFiler.stepList: "步骤列表",
+    caseFiler.model: "所属模块",
 
     caseFiler.isUse: "是否可用",
     caseFiler.dataId: "编号"
@@ -32,6 +33,8 @@ caseReplace = {
 stepReplace = {
     stepFiler.stepNumber: "步骤序号",
     stepFiler.name: "步骤名称",
+    stepFiler.case: "所属用例",
+
 
     stepFiler.requestInfo: "接口访问信息",
     stepFiler.reParams: "替换参数",

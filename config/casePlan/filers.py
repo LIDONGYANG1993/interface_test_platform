@@ -89,6 +89,7 @@ class planFiler:
 class caseFiler:
     caseNumber = "caseNumber"  # 场景用例编号
     name = "name"  # 用例名称
+    model = "model"  # 所属模块
     variable = "variable"  # 局部变量
     stepList = "stepList"  # 步骤列表
 
