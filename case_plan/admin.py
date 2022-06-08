@@ -24,8 +24,9 @@ class publicAdmin(FieldsetsInlineMixin, InlineActionsModelAdminMixin, ImportExpo
     empty_value_display = '无'  # 默认空值展示字段
     list_select_related = True
     list_per_page = 50
+
     formfield_overrides = {
-        JSONField: {'widget': JSONEditorWidget(height=150)},
+        JSONField: {'widget': JSONEditorWidget(height="350px")},
     }
 
     def save_model(self, request, obj: stepModel, form, change):  # 自动保存修改和创建人
@@ -97,10 +98,6 @@ class requestInfoAdmin(publicAdmin):
     ]
     search_fields = ["name", "id", "path"]
 
-    formfield_overrides = {
-        JSONField: {'widget': JSONEditorWidget(height=350)},
-    }
-
 
 @admin.register(stepModel)
 class stepAdmin(publicAdmin):
@@ -115,6 +112,10 @@ class stepAdmin(publicAdmin):
     autocomplete_fields = ["case", "requestInfo"]
     list_display = ("id", "stepNumber", "case","name", "create_user", "update_user", "created_time", "updated_time")
     search_fields = ["name", "id", "case__name"]
+    formfield_overrides = {
+        JSONField: {'widget': JSONEditorWidget(height=150)},
+    }
+
 
 
 @admin.register(caseModel)
@@ -157,41 +158,41 @@ class planAdmin(publicAdmin):
 #     ]
 
 
-@admin.register(assertsModel)
-class assertAdmin(publicAdmin):
-    list_display = ("id", 'name',"func","name_another")
-    fieldsets_with_inlines = [
-        (None, {'fields': ['name']}),
-        (None, {'fields': ["func", "name_another"]})
-    ]
-
-
-@admin.register(extractorModel)
-class extractorAdmin(publicAdmin):
-    list_display = ("id", 'name', 'value', "condition")
-    fieldsets_with_inlines = [
-        (None, {'fields': ['name']}),
-        (None, {'fields': ["value", "condition"]})
-    ]
-
-
-@admin.register(calculaterModel)
-class calculateAdmin(publicAdmin):
-    list_display = ("id", 'name', 'value1', "func", "value2")
-    fieldsets_with_inlines = [
-        (None, {'fields': ['name']}),
-        (None, {'fields': ["value1", "func", "value2"]})
-    ]
-
-
-@admin.register(variableModel)
-class variableAdmin(publicAdmin):
-    list_display = ("id", 'name', 'value')
-    fieldsets_with_inlines = [
-        (None, {'fields': ['name']}),
-        (None, {'fields': ["value"]})
-    ]
-
+# @admin.register(assertsModel)
+# class assertAdmin(publicAdmin):
+#     list_display = ("id", 'name',"func","name_another")
+#     fieldsets_with_inlines = [
+#         (None, {'fields': ['name']}),
+#         (None, {'fields': ["func", "name_another"]})
+#     ]
+#
+#
+# @admin.register(extractorModel)
+# class extractorAdmin(publicAdmin):
+#     list_display = ("id", 'name', 'value', "condition")
+#     fieldsets_with_inlines = [
+#         (None, {'fields': ['name']}),
+#         (None, {'fields': ["value", "condition"]})
+#     ]
+#
+#
+# @admin.register(calculaterModel)
+# class calculateAdmin(publicAdmin):
+#     list_display = ("id", 'name', 'value1', "func", "value2")
+#     fieldsets_with_inlines = [
+#         (None, {'fields': ['name']}),
+#         (None, {'fields': ["value1", "func", "value2"]})
+#     ]
+#
+#
+# @admin.register(variableModel)
+# class variableAdmin(publicAdmin):
+#     list_display = ("id", 'name', 'value')
+#     fieldsets_with_inlines = [
+#         (None, {'fields': ['name']}),
+#         (None, {'fields': ["value"]})
+#     ]
+#
 
 
 # @admin.register(defaultModel)
