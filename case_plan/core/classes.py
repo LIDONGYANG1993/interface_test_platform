@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 # @Date  : 2022/05/25
 # @Name  : 杨望宇
+import datetime
 import json
 import os.path
 import threading
@@ -17,8 +18,10 @@ from case_plan.models import publicModel
 from config.logger import Logger, project_path
 
 asserts_used = []
-log_path = os.path.join(project_path, "logs", "class", "logs_{}.log".format(int(time.time())))
 
+time_str = str(datetime.datetime.now())
+time_str = time_str.replace("-", "_").replace(" ", "__").replace(":", "_").replace(".", "_")
+log_path = os.path.join(project_path, "logs", "class", "logs_{}.log".format(time_str))
 the_logger = Logger(log_path, 'debug', 10, "%(asctime)s-%(message)s").logger
 
 

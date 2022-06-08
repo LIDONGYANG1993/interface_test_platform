@@ -24,9 +24,8 @@ class publicAdmin(FieldsetsInlineMixin, InlineActionsModelAdminMixin, ImportExpo
     empty_value_display = '无'  # 默认空值展示字段
     list_select_related = True
     list_per_page = 50
-
     formfield_overrides = {
-        JSONField: {'widget': JSONEditorWidget},
+        JSONField: {'widget': JSONEditorWidget(height=150)},
     }
 
     def save_model(self, request, obj: stepModel, form, change):  # 自动保存修改和创建人
@@ -105,7 +104,7 @@ class stepAdmin(publicAdmin):
         (None, {'fields': ['name']}),
         ('所属用例', {'fields': ["case"]}),
         ('基本信息', {'fields': ["requestInfo", "stepNumber", ]}),
-        ('替换参数', {'fields': ["params", ], "classes": ["collapse", ]}),
+        ('替换参数', {'fields': ["params", ], "classes": []}),
         extractorLine, calculateLine, assertLine
     ]
     inlines = []
