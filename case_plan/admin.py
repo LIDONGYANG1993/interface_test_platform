@@ -1,28 +1,28 @@
 from django.contrib import admin
-# Register your models here.
 from django.db.models import JSONField
 from django_json_widget.widgets import JSONEditorWidget
 from fieldsets_with_inlines import FieldsetsInlineMixin
-from import_export import resources
 from import_export.admin import ImportExportModelAdmin
 from import_export.formats import base_formats
 from .models import *
 from inline_actions.admin import InlineActionsMixin
 from inline_actions.admin import InlineActionsModelAdminMixin
 from inline_actions.actions import DefaultActionsMixin
+# Register your models here.
 
+# 配置标题
 admin.site.site_title = "接口场景化平台"
 admin.site.site_header = "接口场景化平台"
 admin.site.index_title = "接口场景化平台"
 
-
+# 公共类型
 class publicAdmin(FieldsetsInlineMixin, InlineActionsModelAdminMixin, ImportExportModelAdmin):
     list_display = ["id", 'name', "created_time", "updated_time"]  # 展示字段
     list_display_links = ["id", "name"]  # 展示字段链
-    readonly_fields = ["created_time", "updated_time"]
+    readonly_fields = ["created_time", "updated_time"]  # 只读字段
     search_fields = ["name", "id"]  # 搜索字段
     empty_value_display = '无'  # 默认空值展示字段
-    list_select_related = True
+    list_select_related = False  # 开启关系型搜索
     list_per_page = 50
 
     formfield_overrides = {

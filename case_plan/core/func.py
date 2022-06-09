@@ -9,7 +9,7 @@ import json
 #  _str: a.b.c  _dict:{"a":{"b":{"c":"157888"}}},  condition： [{"w":"9"},{"z":11}]
 import time
 
-
+# 从_dict中提取字符串，依据_str提供的路径，如果遇到list，可在condition中，配置条件
 def get_path_dict_condition(_str: str, _dict: dict, condition: [dict] = None):
     str_list = _str.split('.', 1)
     for rel in str_list:
@@ -40,7 +40,7 @@ def get_condition(condition):
         )
     return condition_list
 
-
+# 数字验证
 def is_number(s):
     try:
         float(s)
@@ -75,7 +75,7 @@ class cal:
     def divide(x, y):
         return x / y
 
-
+#  内部方法，内联类获取实例化多个父级类
 def make_class_list(data_list, className, filterList, parents=None):
     class_list = []
     for asserts in data_list:
@@ -84,7 +84,7 @@ def make_class_list(data_list, className, filterList, parents=None):
         )
     return class_list
 
-
+#  内部方法，内联类实例化单个父级类
 def make_class(data,className, filterList, parents=None):
     if parents:
         data.update(parents)

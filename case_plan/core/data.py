@@ -13,7 +13,11 @@ from config.logger import Logger, project_path
 
 the_logger = Logger('{}/logs/data/data.log'.format(project_path), 'info', 10, "%(asctime)s-%(message)s").logger
 
+#  所有的类都是从数据库中获取数据，并转化成dict格式，以供对应Done类使用
+#  获取数据时，自上而下包含，planData整个计划， caseData单个用例， stepData某个步骤，requestInfoData单接口
+#  特殊情况，获取stepData时，同时会获取所属用例的变量，以供单步骤调试使用
 
+# 公共
 class publicData:
     def __init__(self, model: Model, dataId=None, name=None):
         self.model = model
@@ -37,9 +41,9 @@ class publicData:
         return self.model.objects.filter(id=self.dataId)
 
     def get_data(self):
-        pass
+        pass#
 
-
+# 计划
 class planData(publicData):
     model_data: planModel
     filter = planFiler
@@ -76,7 +80,7 @@ class planData(publicData):
     def get_default_data(self):
         return defaultData(self.model_data.environment_and_type.id).data_dict
 
-
+# 用例
 class caseData(publicData):
     model_data: caseModel
     filer = caseFiler
@@ -123,26 +127,7 @@ class caseData(publicData):
         data_model:caseModel
         self.model_data = data_model
 
-
-class variableData(publicData):
-    model_data: variableModel
-    filer = variableFiler
-
-    def __init__(self, dataId):
-        super().__init__(variableModel, dataId)
-
-    def get_data(self):
-        model_data = self.model_data
-        if not model_data: return None
-
-        the_logger.debug("GET VAR-DATA")
-        return {
-            self.filer.dataId: model_data.id,
-            self.filer.name: model_data.name,
-            self.filer.value: model_data.value
-        }
-
-
+# 步骤
 class stepData(publicData):
     model_data: stepModel
     filer = stepFiler
@@ -203,7 +188,7 @@ class stepData(publicData):
             case_variable = case_data.get_variable_data()
         return case_variable
 
-
+# 单接口
 class requestInfoData(publicData):
     model_data: requestInfoModel
     filer = requestInfoFiler
@@ -227,6 +212,26 @@ class requestInfoData(publicData):
             self.filer.data: model_data.params
         }
 
+# 变量 -包括计划的变量和用例的变量
+class variableData(publicData):
+    model_data: variableModel
+    filer = variableFiler
+
+    def __init__(self, dataId):
+        super().__init__(variableModel, dataId)
+
+    def get_data(self):
+        model_data = self.model_data
+        if not model_data: return None
+
+        the_logger.debug("GET VAR-DATA")
+        return {
+            self.filer.dataId: model_data.id,
+            self.filer.name: model_data.name,
+            self.filer.value: model_data.value
+        }
+
+# 提取器
 class extractorData(publicData):
     model_data: extractorModel
     filer = extractorFiler
@@ -246,7 +251,7 @@ class extractorData(publicData):
             self.filer.condition: model_data.condition,
         }
 
-
+# 计算器
 class calculaterData(publicData):
     model_data: calculaterModel
     filer = calculatorFiler
@@ -267,7 +272,7 @@ class calculaterData(publicData):
             self.filer.calFunction: model_data.func,
         }
 
-
+# 验证器
 class assertData(publicData):
     model_data: assertsModel
     filer = assertsFiler
@@ -287,7 +292,7 @@ class assertData(publicData):
             self.filer.assertMethod: model_data.func
         }
 
-
+# 默认数据
 class defaultData(publicData):
     model_data: defaultModel
     filer = configFiler
@@ -306,6 +311,7 @@ class defaultData(publicData):
             self.filer.value: model_data.value,
         }
 
+# token表
 class tokenData(publicData):
     model_data: tokenModel
     model: tokenModel

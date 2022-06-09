@@ -2,11 +2,10 @@
 # -*- coding: utf-8 -*-
 # @Date  : 2022/05/25
 # @Name  : 杨望宇
+
 import datetime
-import json
 import os.path
 import threading
-import time
 from copy import deepcopy
 from config.wanba.interfaceRequest import get_token, app_request
 from config.casePlan import defaultParams
@@ -25,6 +24,7 @@ log_path = os.path.join(project_path, "logs", "class", "logs_{}.log".format(time
 the_logger = Logger(log_path, 'debug', 10, "%(asctime)s-%(message)s").logger
 
 
+# 公共的done类
 class publicDone:
     def __init__(self, data: dict):
         self.data = data
@@ -41,6 +41,7 @@ class publicDone:
         thread = threading.Thread(target=func, args=params)
         self.thread.append(thread)
 
+    # 为内部方法提供异步调用
     @staticmethod
     def _thread_run_join(func, params=None):
         if params is None: params = []
@@ -48,12 +49,14 @@ class publicDone:
         thread.start()
         thread.join()
 
+    # 为内部方法提供同步调用
     @staticmethod
     def _run(func, params=None):
         if not params:
             return func()
         return func(params)
 
+    # 从上游数据，提取公共的全局变量
     @staticmethod
     def public_variable(step=None, case=None, plan=None):
         step: stepDone
@@ -61,40 +64,53 @@ class publicDone:
         plan: planDone
         res = {}
         if plan:
-            res.update(plan.variable_dict())
+            res.update(plan.variable_dict())  # 计划的预置变量
         if case:
-            res.update(case.variable_dict())
-            res.update(case.extractor_result)
-            res.update(case.calculater_result)
+            res.update(case.variable_dict())  # 用例的预置变量
+            res.update(case.extractor_result)  # 所有步骤下，提取器提取的结果
+            res.update(case.calculater_result)  # 所有步骤下，计算器计算的结果
         if step:
-            res.update(step.extractor_result)
-            res.update(step.calculator_result)
+            res.update(step.extractor_result)  # 当前步骤下，步骤的提取结果
+            res.update(step.calculator_result)  # 当前步骤下，步骤的计算结果
             if not case and step.case_variable:
-                res.update(step.case_variable_dict())
+                res.update(step.case_variable_dict())  # 当前步骤所属的用例下，预置变量
         return res
 
+    # 从data中，完成变量替换
     def variable_replace(self, data, replaceData: dict):
-        if isinstance(data, str):
+        if isinstance(data, str):  # 字符串类型的替换
             return self.str_replace(data, replaceData)
-        if isinstance(data, dict):
+        if isinstance(data, dict):  # 字典类型的替换
             return self.dict_replace(data, replaceData)
+        if isinstance(data, list):  # 字典类型的替换
+            return self.list_replace(data, replaceData)
 
+    # 尝试从字符串中找寻替换变量，并完成替换
     @staticmethod
     def str_replace(data, replaceData):
         data_copy = deepcopy(data)
-        data_copy = data_copy.replace("{{", "{").replace("}}", "}")
         try:
+            data_copy = data_copy.replace("{{", "{").replace("}}", "}")  # 替换格式为"{{}}",并转换为{}
             res = data_copy.format(**replaceData)
-        except Exception as e:
+        except Exception:
             return data
         return res
 
+    # 尝试从字符串中找寻变量，并完成替换
     def dict_replace(self, data: dict, replaceData):
         for data_key in data.keys():
             data[data_key] = self.variable_replace(data[data_key], replaceData)
         return data
 
+    # 尝试从列表中找寻变量，并完成替换
+    def list_replace(self, data: dict, replaceData):
+        data_res = []
+        for data_key in data:
+            data_res.append(self.variable_replace(data_key, replaceData))
+        return data_res
 
+
+#  提取器Done类
 class extractorDone(publicDone):
     def __init__(self, data):
         super().__init__(data)
@@ -103,7 +119,6 @@ class extractorDone(publicDone):
         self.step = self.get_step
         self.condition = self.get_condition
         self.name = self.get_name
-
         self.value = None
 
     @property
@@ -137,6 +152,7 @@ class extractorDone(publicDone):
             the_logger.debug("提取结果失败：value-{}, response--{}".format(self.filedPath, data))
 
 
+# 计算器done类
 class calculaterDone(publicDone):
     def __init__(self, data):
         super().__init__(data)
@@ -167,10 +183,10 @@ class calculaterDone(publicDone):
     def get_variable2(self):
         return self._get_value(calculatorFiler.Variable2)
 
+    # 计算器 计算方法
     def calculate(self):
-
-        variable1 = float(self.variable1)
-        variable2 = float(self.variable2)
+        variable1 = self.get_number(self.variable1)
+        variable2 = self.get_number(self.variable2)
         if self.calFunction == publicModel.calChoices.ADD:
             return cal.add(variable1, variable2)
         if self.calFunction == publicModel.calChoices.SUB:
@@ -181,22 +197,30 @@ class calculaterDone(publicDone):
             return cal.divide(variable1, variable2)
         return None
 
+    # 直接获取计算结果，如果计算器参数不足或者不规范，则结果为None
     def get_result(self):
-        self.replace_in_calculater()
+        self.replace_in_calculater()  # 计算之前，先进行变量的替换
         self.result = None
         if is_number(self.variable1) and is_number(self.variable2):
             self.result = self.calculate()
 
+    @staticmethod
+    def get_number(number):  # 如果数字是整形，则返回整形，否则返回浮点型
+        return int(number) if number == int(number) else number
+
+    # 全局变量的替换
     def replace_in_calculater(self):
         self.step: stepDone
         variable = None
         if self.step:
+            # 根据级别所在，分别从上游步骤，步骤上游用例，用例上游计划，提取全局变量
             variable = self.public_variable(self.step, self.step.case if self.step.case else None,
                                             self.step.case.plan if self.step.case and self.step.case.plan else None)
         if not variable: return
         self.variable1 = self.variable_replace(self.variable1, variable)
         self.variable2 = self.variable_replace(self.variable2, variable)
 
+    # 返回json格式的计算结果，服务器与API
     def calculater_for_api(self):
         return {
             calculatorFiler.name: self.name,
@@ -207,6 +231,7 @@ class calculaterDone(publicDone):
         }
 
 
+#  验证器Done类
 class assertsDone(publicDone):
     def __init__(self, data: dict):
         super().__init__(data)
@@ -256,6 +281,7 @@ class assertsDone(publicDone):
     def get_value2(self):
         return self._get_value(assertsFiler.value2)
 
+    #  列出验算算式
     @property
     def get_asserts_str(self):
         if not self.value1 or not self.value2 or not self.assertMethod:
@@ -264,6 +290,7 @@ class assertsDone(publicDone):
             return str(self.value1) + str(self.assertMethod) + str(self.value2)
         return '"{}"'.format(str(self.value1)) + str(self.assertMethod) + '"{}"'.format(str(self.value2))
 
+    # 执行字符串代码，直接验算
     def asserts(self):
         self.replace_in_asserts()
         self.asserts_str = self.get_asserts_str
@@ -274,7 +301,6 @@ class assertsDone(publicDone):
         return self.asserts_result
 
     def get_result(self):
-
         self.result = {
             assertsFiler.step: self.step,
             assertsFiler.case: self.case,
@@ -287,6 +313,7 @@ class assertsDone(publicDone):
         except Exception:
             self.result.update({assertsFiler.result: False})
 
+    # 返回json格式的计算结果，服务器与API
     def asserts_result_for_api(self):
         return {
             assertsFiler.value1: self.value1,
@@ -297,6 +324,7 @@ class assertsDone(publicDone):
         }
 
 
+# 接口信息Done类
 class requestDone(publicDone):
     def __init__(self, data):
         super().__init__(data)
@@ -319,18 +347,6 @@ class requestDone(publicDone):
         self.error = None
         self.code = 0
 
-    def replace_in_requestInfo(self):
-        self.step: stepDone
-        variable = None
-        if self.step:
-            variable = self.public_variable(self.step, self.step.case if self.step.case else None,
-                                            self.step.case.plan if self.step.case and self.step.case.plan else None)
-        if not variable: return
-        self.host = self.variable_replace(self.host, variable)
-        self.path = self.variable_replace(self.path, variable)
-        self.params = self.variable_replace(self.params, variable)
-        self.data = self.variable_replace(self.data, variable)
-        self.post_data = self.variable_replace(self.post_data, variable)
 
     @property
     def get_name(self):
@@ -364,36 +380,53 @@ class requestDone(publicDone):
     def get_step(self):
         return self._get_value(requestInfoFiler.step)
 
+    #  全局参数替换
+    def replace_in_requestInfo(self):
+        self.step: stepDone
+        variable = None
+        if self.step:
+            variable = self.public_variable(self.step, self.step.case if self.step.case else None,
+                                            self.step.case.plan if self.step.case and self.step.case.plan else None)
+        if not variable: return
+        self.host = self.variable_replace(self.host, variable)
+        self.path = self.variable_replace(self.path, variable)
+        self.params = self.variable_replace(self.params, variable)
+        self.data = self.variable_replace(self.data, variable)
+        self.post_data = self.variable_replace(self.post_data, variable)
+
+    # 访问请求
     def request(self):
         the_logger.debug("START-REQUEST,  {}, {}, {}, {}".format(self.name, self.host if self.host else None, self.path,
                                                                  self.params), )
-        self.replace_in_requestInfo()
+        self.replace_in_requestInfo()  # 访问接口之前，执行参数替换
         if self.host:
-            self.request_for_public()
+            self.request_for_public()  # 如果host存在，不执行环境配置，直接请求
         else:
-            self.request_for_wanba()
+            self.request_for_wanba()  # 如果有host，执行配置环境
         the_logger.debug("END-REQUEST,  {}, {}, {}, {}".format(self.name, self.host if self.host else None, self.path,
                                                                self.response.json() if self.error is False else None))
 
+    # 玩吧专属的接口请求
     def request_for_wanba(self):
         self.response = app_request(case_url=self.path, params=self.params, environment=self.environment)
 
+    # 通用接口请求
     def request_for_public(self):
         if self.method == "GET":
             self.response = requests.get(url=self.host + self.path, params=self.params, headers=self.headers)
-
         else:
             self.response = requests.get(url=self.host + self.path, data=self.params, headers=self.headers)
 
+    # 接口请求的校验
     def asserts(self):
         self.response: requests.Response
 
-        if not self.response:
+        if not self.response:  # 校验assert
             self.error = True
             self.code = 99999
             self.response_json = None
 
-        elif self.response.status_code != 200:
+        elif self.response.status_code != 200:  # 校验code
             self.error = True
             self.code = self.response.status_code
             self.response_json = None
@@ -402,6 +435,7 @@ class requestDone(publicDone):
             self.code = self.response.status_code
             self.response_json = self.response.json()
 
+    # 如果玩吧token失效，重新获取token，并重新执行request，仅校验一次
     def assert_wanba(self):
         if self.error is True: return
         if self.response.json()["code"] == 10202 or self.response.json()["code"] == 3:
@@ -409,6 +443,7 @@ class requestDone(publicDone):
             self.request()
             self.asserts()
 
+    # 返回json格式的结果，服务与API
     def result_for_api(self):
         self.result_massage()
         return {
@@ -421,6 +456,7 @@ class requestDone(publicDone):
 
         }
 
+    # 搜集msg
     def result_massage(self):
         msg = []
         if self.error is None or self.error is True:
@@ -429,9 +465,7 @@ class requestDone(publicDone):
             msg.append("接口：{},访问成功！\n".format(self.name))
         self.msg = msg
 
-    def make_environment(self):
-        environment = self.get_environment()
-
+    # 当独立运行requestInfo时，使用配置好的默认环境--此处原本设计为从数据库中读取，暂未实现
     def get_environment(self):
         if not self.step: return defaultParams
         if not self.step.case: return defaultParams
@@ -439,6 +473,7 @@ class requestDone(publicDone):
         return self.step.case.plan.environment
 
 
+#  变量Done类
 class variableDone(publicDone):
     def __init__(self, data):
         super().__init__(data)
@@ -464,6 +499,7 @@ class variableDone(publicDone):
         return self._get_value(variableFiler.plan)
 
 
+#  步骤Done类
 class stepDone(publicDone):
     response: Response
     calculator_list: [calculaterDone]
@@ -530,8 +566,7 @@ class stepDone(publicDone):
         parents = {calculatorFiler.step: self}
         return make_class_list(self._get_value(stepFiler.calculator), calculaterDone, calculatorFiler.used, parents)
 
-
-
+    #  在步骤中替换参数
     def replace_in_step(self):
         self.case: caseDone
         variable = None
@@ -540,12 +575,14 @@ class stepDone(publicDone):
         if not variable: return
         self.reParams = self.variable_replace(self.reParams, variable)
 
+    #  在步骤中，实现接口访问
     def request(self):
         self.replace_in_step()
-        if self.reParams:
+        if self.reParams: # 当预置了替换参数时，参数会在这里被替换掉
             self.requestInfo.params.update(self.reParams)
         self._thread_run_join(self.requestInfo.request)
 
+    #  接口基本验证
     def asserts_response(self):
         self.requestInfo.asserts()
         self.requestInfo.assert_wanba()
@@ -553,6 +590,7 @@ class stepDone(publicDone):
         self.error = self.requestInfo.error
         self.code = self.requestInfo.code
 
+    # 在步骤中，执行提取器
     def extractor_in_step(self):
         for extractor in self.extractor_list:
             extractor: extractorDone
@@ -561,6 +599,7 @@ class stepDone(publicDone):
             the_logger.debug("END-EXTRACTOR: {}--{} ".format(extractor.name, extractor.value))
             self.extractor_result.update({extractor.name: extractor.value})
 
+    # 在步骤中执行计算器
     def calculater_in_step(self):
         for calculater in self.calculator_list:
             calculater: calculaterDone
@@ -572,6 +611,24 @@ class stepDone(publicDone):
             self.calculator_result.update({calculater.name: calculater.result})
             self.calculator_result_for_api.append(calculater.calculater_for_api())
 
+    # 在步骤中执行验证器
+    def asserts_in_step(self):
+        for asserts in self.asserts_list:
+            if self.fail: return   # 当验证已经失败时，停止继续验证
+            asserts: assertsDone
+            the_logger.debug("START-ASSERT-CASE: {} ".format(asserts.asserts_str))
+            self._thread_run_join(func=asserts.get_result)
+            the_logger.debug("END-ASSERT-CASE: {}--{}".format(asserts.asserts_str, asserts.asserts_result))
+            if not asserts.asserts_result:  # 步骤的执行结果，遵循验证器的验证结果
+                self.fail = True
+            else:
+                self.fail = False
+            self.asserts_result.append( # 收集验证器的信息
+                {assertsFiler.assertStr: asserts.asserts_str, assertsFiler.result: asserts.result})
+            self.asserts_result_for_api.append(asserts.asserts_result_for_api())
+        return
+
+    # stepDone的特殊方法，如果独立运行step，且step上游case存在变量，字典化以供替换使用
     def case_variable_dict(self):
         res = {}
         for variable in self.case_variable:
@@ -583,30 +640,18 @@ class stepDone(publicDone):
             )
         return res
 
-    def asserts_in_step(self):
-        for asserts in self.asserts_list:
-            if self.fail: return
-            asserts: assertsDone
-            the_logger.debug("START-ASSERT-CASE: {} ".format(asserts.asserts_str))
-            self._thread_run_join(func=asserts.get_result)
-            the_logger.debug("END-ASSERT-CASE: {}--{}".format(asserts.asserts_str, asserts.asserts_result))
-            if not asserts.asserts_result:
-                self.fail = True
-            else: self.fail = False
-            self.asserts_result.append({assertsFiler.assertStr: asserts.asserts_str, assertsFiler.result: asserts.result})
-            self.asserts_result_for_api.append(asserts.asserts_result_for_api())
-        return
-
+    # 执行步骤
     def run_in_step(self):
         self.request()
         self.asserts_response()
-        if self.error:
+        if self.error:  # 当步骤异常时，标记失败，停止提取/计算/验证
             self.fail = True
             return
         self.extractor_in_step()
         self.calculater_in_step()
         self.asserts_in_step()
 
+    # 返回json格式的结果，服务与API
     def result_for_api(self):
         self.result_massage()
         return {
@@ -620,6 +665,7 @@ class stepDone(publicDone):
 
         }
 
+    #  收集步骤的信息
     def result_massage(self):
         msg = []
         if self.error:
@@ -633,12 +679,12 @@ class stepDone(publicDone):
                 msg.append("验证：{},验证失败！\n".format(asserts.asserts_str))
                 break
             else:
-                msg.append( "验证：{}, 验证成功！\n".format(asserts.asserts_str))
+                msg.append("验证：{}, 验证成功！\n".format(asserts.asserts_str))
         self.msg = msg
 
 
-
-class   caseDone(publicDone):
+#  用例Done类
+class caseDone(publicDone):
     def __init__(self, data):
         super().__init__(data)
         self.msg = None
@@ -687,6 +733,7 @@ class   caseDone(publicDone):
         parents = {assertsFiler.case: self, assertsFiler.step: None}
         return make_class_list(self._get_value(caseFiler.assertList), assertsDone, assertsFiler.used, parents)
 
+    # 用例变量的收集，供替换参数使用
     def variable_dict(self):
         res = {}
         for variable in self.variable:
@@ -698,6 +745,7 @@ class   caseDone(publicDone):
             )
         return res
 
+    # 验证用例结果
     def asserts_in_case(self):
         if self.fail:
             return
@@ -713,23 +761,24 @@ class   caseDone(publicDone):
             if not asserts.asserts_result:
                 self.fail = True
 
-    def update_variable(self):
-        self.variable.update(self.plan.variable)
-
+    #  执行case
     def run_in_case(self):
         for step in self.step_list:
             step: stepDone
-            if self.fail: return
+            if self.fail: return  # 如果当前步骤异常，停止继续执行，停止验证
             the_logger.debug("START-STEP, {}-{} ".format(step.stepNumber, step.name))
             self._thread_run_join(step.run_in_step), time.sleep(0)
             the_logger.debug("END-STEP, {}-{} ".format(step.stepNumber, step.name))
             self.extractor_result.update(step.extractor_result)
             self.calculater_result.update(step.calculator_result)
             self.step_result_for_api.append(step.result_for_api())
-            if not (step.error is False) or not (step.fail is False): self.fail = True
-            else:self.fail = False
-        self.asserts_in_case()
+            if not (step.error is False) or not (step.fail is False): # 如果实行失败或者异常，标记用例失败
+                self.fail = True
+            else:
+                self.fail = False
+        self.asserts_in_case()  # 正常执行所有步骤之后，进行用例的验证
 
+    #  在本条用例中收集替换参数，以供之后的用例使用
     def get_replace_result(self):
         if self.plan:
             self.plan: planDone
@@ -739,6 +788,7 @@ class   caseDone(publicDone):
         self.replace_result.update(self.extractor_result)
         self.replace_result.update(self.calculater_result)
 
+    # 返回json格式的结果，服务与API
     def result_for_api(self):
         self.result_massage()
         return {
@@ -748,12 +798,13 @@ class   caseDone(publicDone):
             "msg": self.msg
         }
 
+    # 收集用例测msg信息
     def result_massage(self):
         msg = []
         for step in self.step_list:
             step: stepDone
             if not (step.error is False):
-                msg.append( "步骤：{}-{},执行异常！\n".format(step.stepNumber, step.name))
+                msg.append("步骤：{}-{},执行异常！\n".format(step.stepNumber, step.name))
                 break
             elif not (step.fail is False):
                 msg.append("步骤：{}-{},执行失败！\n".format(step.stepNumber, step.name))
@@ -768,6 +819,8 @@ class   caseDone(publicDone):
                 msg.append("验证：{}, 验证成功！\n".format(asserts.asserts_str))
         self.msg = msg
 
+
+# 计划Done类
 class planDone(publicDone):
     def __init__(self, data):
         super().__init__(data)
@@ -781,7 +834,6 @@ class planDone(publicDone):
         self.case_list = self.get_case_list
 
         self.msg = None
-
 
     @property
     def get_variable(self):
@@ -801,6 +853,7 @@ class planDone(publicDone):
         parents = {caseFiler.plan: self}
         return make_class_list(self._get_value(planFiler.caseList), caseDone, caseFiler.used, parents)
 
+    #  执行
     def run_in_plan(self):
         the_logger.debug("START-PLAN")
 
@@ -814,21 +867,24 @@ class planDone(publicDone):
             self.case_result_for_api.append(case.result_for_api())
         the_logger.debug("END-PLAN")
 
+    # 收集替换参数
     def get_replace_result(self):
         for var in self.variable:
             self.replace_result.update(var)
         self.replace_result.update(self.extractor_result)
 
+    # 返回json格式的结果，服务与API
     def result_for_api(self):
         self.result_massage()
         return {
             planFiler.name: self.name,
             planFiler.environment: self.environment,
             planFiler.caseList: self.case_result_for_api,
-            "msg":self.msg
+            "msg": self.msg
 
         }
 
+    # 收集msg
     def result_massage(self):
         msg = []
         for case in self.case_list:
@@ -896,8 +952,6 @@ def assertsDoneTest():
 
 def planDoneTest():
     from case_plan.core.data import planData
-
-    from case_plan.core import planTest
     plan = planDone(planData(dataId=1).data_dict)
     plan.run_in_plan()
     print("END")

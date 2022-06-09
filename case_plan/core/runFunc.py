@@ -8,6 +8,7 @@ from config.casePlan.yamlFilersZh import *
 from case_plan.core.classes import *
 from case_plan.core.data import *
 
+#  执行单接口
 def run_requestInfo(data_id):
     data = requestInfoData(dataId=data_id)
     done = requestDone(data.data_dict)
@@ -16,21 +17,21 @@ def run_requestInfo(data_id):
     done.assert_wanba()
     return done.result_for_api()
 
-
+#  执行单个步骤
 def run_step(data_id):
     data = stepData(dataId=data_id)
     done = stepDone(data.data_dict)
     done.run_in_step()
     return done.result_for_api()
 
-
+#  执行单条用例
 def run_case(data_id):
     data = caseData(dataId=data_id)
     done = caseDone(data.data_dict)
     done.run_in_case()
     return done.result_for_api()
 
-
+#  执行一整个计划
 def run_plan(data_id):
     data = planData(dataId=data_id)
     done = planDone(data.data_dict)
