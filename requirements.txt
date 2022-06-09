@@ -6,6 +6,7 @@ diff-match-patch==20200713
 Django==4.0.4
 django-fieldsets-with-inlines==0.6
 django-import-export==2.8.0
+django-inline-actions==2.4.0
 django-json-widget==1.1.1
 django-simple-tags==0.6.0
 django-simpleui==2022.4.9
