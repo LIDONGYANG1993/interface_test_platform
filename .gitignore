@@ -1,0 +1,12 @@
+
+./config/my.cnf
+*.py[cod]
+*.so
+*.egg
+*.egg-info
+dist
+build
+logs
+templates
+case_plan/migrations/
+.DS_Store
