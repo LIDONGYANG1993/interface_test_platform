@@ -119,6 +119,10 @@ class caseData(publicData):
             res_data_list.append(stepData(dataId=data_model.id).data_dict)
         return res_data_list
 
+    def new_case(self, data_model):
+        data_model:caseModel
+        self.model_data = data_model
+
 
 class variableData(publicData):
     model_data: variableModel
@@ -160,6 +164,7 @@ class stepData(publicData):
             self.filer.assertList: self.get_asserts_data(),
             self.filer.calculator: self.get_calculator_data(),
             self.filer.extractor: self.get_extractor_data(),
+            self.filer.case_variable: self.get_case_variable(),
         }
 
     def get_requestInfo_data(self):
@@ -189,6 +194,14 @@ class stepData(publicData):
 
     def request_in_step(self):
         pass
+
+    def get_case_variable(self):
+        case_variable = {}
+        if self.model_data.case:
+            case_data = caseData()
+            case_data.new_case(self.model_data.case)
+            case_variable = case_data.get_variable_data()
+        return case_variable
 
 
 class requestInfoData(publicData):

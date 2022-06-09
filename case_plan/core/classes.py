@@ -69,6 +69,8 @@ class publicDone:
         if step:
             res.update(step.extractor_result)
             res.update(step.calculator_result)
+            if not case and step.case_variable:
+                res.update(step.case_variable_dict())
         return res
 
     def variable_replace(self, data, replaceData: dict):
@@ -477,6 +479,7 @@ class stepDone(publicDone):
         self.asserts_list: [assertsDone] = self.get_asserts_list
         self.extractor_list: [extractorDone] = self.get_extractor_list
         self.calculator_list = self.get_calculator_list
+        self.case_variable = self.get_case_variable
         self.extractor_result = {}
         self.calculator_result = {}
         self.asserts_result_for_api = []
@@ -504,8 +507,8 @@ class stepDone(publicDone):
         return self._get_value(stepFiler.reParams)
 
     @property
-    def get_plan(self):
-        return self._get_value(variableFiler.plan)
+    def get_case_variable(self):
+        return self._get_value(stepFiler.case_variable)
 
     @property
     def get_requestInfo(self):
@@ -527,11 +530,13 @@ class stepDone(publicDone):
         parents = {calculatorFiler.step: self}
         return make_class_list(self._get_value(stepFiler.calculator), calculaterDone, calculatorFiler.used, parents)
 
+
+
     def replace_in_step(self):
         self.case: caseDone
         variable = None
         if self.case:
-            variable = self.public_variable(None, self.case, self.case.plan if self.case.plan else None)
+            variable = self.public_variable(self, self.case, self.case.plan if self.case.plan else None)
         if not variable: return
         self.reParams = self.variable_replace(self.reParams, variable)
 
@@ -566,6 +571,17 @@ class stepDone(publicDone):
                                                                       calculater.variable2, calculater.result))
             self.calculator_result.update({calculater.name: calculater.result})
             self.calculator_result_for_api.append(calculater.calculater_for_api())
+
+    def case_variable_dict(self):
+        res = {}
+        for variable in self.case_variable:
+            res.update(
+                {
+                    variable[variableFiler.name]: variable[variableFiler.value]
+
+                }
+            )
+        return res
 
     def asserts_in_step(self):
         for asserts in self.asserts_list:
@@ -622,7 +638,7 @@ class stepDone(publicDone):
 
 
 
-class caseDone(publicDone):
+class   caseDone(publicDone):
     def __init__(self, data):
         super().__init__(data)
         self.msg = None

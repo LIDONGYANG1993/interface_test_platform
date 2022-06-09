@@ -116,6 +116,7 @@ class stepFiler:
     extractor = "extractor"  # 提取器
     calculator = "calculator"  # 计算器
     assertList = "assertList"  # 验证器
+    case_variable = "case_variable"  # 验证器
 
     used = [name, stepNumber, requestInfo, reParams, extractor, calculator, assertList, case]
 
