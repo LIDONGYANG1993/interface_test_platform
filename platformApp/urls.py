@@ -16,10 +16,10 @@ Including another URLconf
 from django.contrib import admin
 from django.template.defaulttags import url
 from django.urls import path
-from case_plan.urls import url_case
+from case_plan.urls import debug_url
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('run/', url_case, )
+    path('run/', debug_url(), )
 
 ]
