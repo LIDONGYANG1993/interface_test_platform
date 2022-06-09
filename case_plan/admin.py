@@ -79,7 +79,6 @@ class caseAssertLine(assertLine):
 
 class caseVariableLine(variableLine):
     verbose_name_plural = "用例变量"
-    classes = ["collapse"]
 
 
 class stepLine(InlineActionsMixin, DefaultActionsMixin, publicLine):
