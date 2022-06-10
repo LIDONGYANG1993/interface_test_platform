@@ -1,11 +1,5 @@
-import datetime
-import json
-import time
-
-from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-
 from config.casePlan.yamlFilersZh import *
 
 
@@ -65,6 +59,7 @@ class publicModel(models.Model):
     def get_related_name_update_user(self):
         return self.related_name + "update_user"
 
+
 class defaultModel(publicModel):
     related_name = "default"
     name = models.CharField(configReplace[configFiler.name], max_length=100, default="environment", blank=False)
@@ -72,6 +67,7 @@ class defaultModel(publicModel):
 
     def __str__(self):
         return "{}".format(self.name)
+
 
 class variableModel(publicModel):
     related_name = "variable"
@@ -92,7 +88,8 @@ class variableModel(publicModel):
 
 class extractorModel(publicModel):
     related_name = "extractor"
-    step = models.ForeignKey("stepModel", verbose_name=extractorReplace[extractorFiler.step], unique=False,on_delete=models.SET_NULL, blank=False, editable=False, null=True)
+    step = models.ForeignKey("stepModel", verbose_name=extractorReplace[extractorFiler.step], unique=False,
+                             on_delete=models.SET_NULL, blank=False, editable=False, null=True)
     name = models.CharField(extractorReplace[extractorFiler.name], max_length=100, default="CODE", blank=False)
     value = models.CharField(extractorReplace[extractorFiler.value], max_length=100, default="code", blank=False)
     condition = models.CharField(extractorReplace[extractorFiler.condition], max_length=100, default="", blank=True)
@@ -110,9 +107,10 @@ class assertsModel(publicModel):
     related_name = "asserts"
     name = models.CharField(assertsReplace[assertsFiler.value1], max_length=100, default="{{CODE}}", blank=False)
 
-    step = models.ForeignKey("stepModel", verbose_name=extractorReplace[extractorFiler.step], unique=False,on_delete=models.SET_NULL, blank=False, editable=False, null=True)
+    step = models.ForeignKey("stepModel", verbose_name=extractorReplace[extractorFiler.step], unique=False,
+                             on_delete=models.CASCADE, blank=False, editable=False, null=True)
     case = models.ForeignKey("caseModel", verbose_name=assertsReplace[assertsFiler.case], unique=False,
-                             on_delete=models.CASCADE, blank=True, editable=False, null=True)
+                             on_delete=models.CASCADE, blank=False, editable=False, null=True)
     func = models.CharField(assertsReplace[assertsFiler.assertMethod], max_length=5,
                             default=publicModel.funcChoices.EQL, choices=publicModel.funcChoices.choices, blank=False)
     name_another = models.CharField(assertsReplace[assertsFiler.value2], max_length=100, default=0, blank=False)
@@ -128,7 +126,8 @@ class assertsModel(publicModel):
 class calculaterModel(publicModel):
     related_name = "calculater"
     name = models.CharField(calculatorReplace[calculatorFiler.name], max_length=100, default="variable0", blank=False)
-    step = models.ForeignKey("stepModel", verbose_name=calculatorReplace[calculatorFiler.step], unique=False,on_delete=models.CASCADE)
+    step = models.ForeignKey("stepModel", verbose_name=calculatorReplace[calculatorFiler.step], unique=False,
+                             on_delete=models.CASCADE)
     value1 = models.CharField(calculatorReplace[calculatorFiler.Variable1], max_length=100, default="{{variable1}}",
                               blank=False)
     func = models.CharField(calculatorReplace[calculatorFiler.calFunction], max_length=10,
@@ -154,7 +153,6 @@ class requestInfoModel(publicModel):
     headers = models.JSONField(requestInfoReplace[requestInfoFiler.headers], max_length=500, default=dict, blank=True)
     params = models.JSONField(requestInfoReplace[requestInfoFiler.params], max_length=500, default=dict, blank=True)
 
-
     class Meta:
         verbose_name = "接口与参数"
         verbose_name_plural = "004-接口与参数"
@@ -165,10 +163,11 @@ class requestInfoModel(publicModel):
 
 class stepModel(publicModel):
     name = models.CharField(stepReplace[stepFiler.name], max_length=500, default=None, blank=False)
-    requestInfo = models.ForeignKey("requestInfoModel", verbose_name=stepReplace[stepFiler.requestInfo], unique=False,on_delete=models.CASCADE)
+    requestInfo = models.ForeignKey("requestInfoModel", verbose_name=stepReplace[stepFiler.requestInfo], unique=False,
+                                    on_delete=models.CASCADE)
     params = models.JSONField(stepReplace[stepFiler.reParams], max_length=500, default=dict, blank=True)
     stepNumber = models.IntegerField(stepReplace[stepFiler.stepNumber], default=1, auto_created=True)
-    case = models.ForeignKey("caseModel", verbose_name=stepReplace[stepFiler.case],related_name="step",default=None, blank=True, on_delete=models.SET_NULL,null=True)
+    case = models.ForeignKey("caseModel", verbose_name=stepReplace[stepFiler.case], related_name="step", default=None,blank=False, on_delete=models.CASCADE, null=True)
 
     class Meta:
         verbose_name = "测试步骤"
@@ -179,9 +178,10 @@ class stepModel(publicModel):
         return "{}-{}".format(self.stepNumber, self.name)
 
     def case_str(self):
-        return [rel for rel in self.case.all()]
+        return [rel for rel in self.case]
 
     case_str.short_description = "所属用例"
+
 
 class caseModel(publicModel):
     related_name = "case"
@@ -197,18 +197,18 @@ class caseModel(publicModel):
     def __str__(self):
         return "{}".format(self.name)
 
-
     def step_str(self):
         return [rel for rel in self.step.all()]
 
-
     step_str.short_description = "步骤"
+
 
 class planModel(publicModel):
     related_name = "plan"
 
     name = models.CharField(planReplace[planFiler.name], max_length=500, default=None, blank=False)
-    environment_and_type = models.ForeignKey("defaultModel", on_delete=models.SET_NULL, null=True, verbose_name=planReplace[planFiler.environment], max_length=5, default=1)
+    environment_and_type = models.ForeignKey("defaultModel", on_delete=models.SET_NULL, null=True,
+                                             verbose_name=planReplace[planFiler.environment], max_length=5, default=1)
     case = models.ManyToManyField(caseModel, verbose_name=planReplace[planFiler.caseList], default=None, blank=True)
 
     class Meta:
@@ -218,7 +218,6 @@ class planModel(publicModel):
     def __str__(self):
         return "{}".format(self.name)
 
-
     def val_list_str(self):
         return [rel for rel in self.variable.all().order_by("name")]
 
@@ -227,6 +226,7 @@ class planModel(publicModel):
 
     case_list_str.short_description = "用例集合"
     val_list_str.short_description = "变量集合"
+
 
 class tokenModel(publicModel):
     related_name = "token"

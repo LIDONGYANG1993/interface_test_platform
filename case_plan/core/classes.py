@@ -7,7 +7,7 @@ import datetime
 import os.path
 import threading
 from copy import deepcopy
-from config.wanba.interfaceRequest import get_token, app_request
+from config.wanba.interfaceRequest import get_token, app_request, assert_token_test
 from config.casePlan import defaultParams
 import requests
 from requests import Response
@@ -328,6 +328,7 @@ class assertsDone(publicDone):
 class requestDone(publicDone):
     def __init__(self, data):
         super().__init__(data)
+        self.token = None
         self.msg = None
         self.name = self.get_name
         self.host = self.get_host
@@ -398,7 +399,9 @@ class requestDone(publicDone):
     def request(self):
         the_logger.debug("START-REQUEST,  {}, {}, {}, {}".format(self.name, self.host if self.host else None, self.path,
                                                                  self.params), )
+
         self.replace_in_requestInfo()  # 访问接口之前，执行参数替换
+        self.token = get_token(self.params, self.environment)
         if self.host:
             self.request_for_public()  # 如果host存在，不执行环境配置，直接请求
         else:
@@ -578,7 +581,7 @@ class stepDone(publicDone):
     #  在步骤中，实现接口访问
     def request(self):
         self.replace_in_step()
-        if self.reParams: # 当预置了替换参数时，参数会在这里被替换掉
+        if self.reParams:  # 当预置了替换参数时，参数会在这里被替换掉
             self.requestInfo.params.update(self.reParams)
         self._thread_run_join(self.requestInfo.request)
 
