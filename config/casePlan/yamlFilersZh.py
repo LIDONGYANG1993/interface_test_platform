@@ -48,7 +48,7 @@ stepReplace = {
 
 }
 
-requestInfoReplace= {
+requestInfoReplace = {
     requestInfoFiler.name: "接口名称",
     requestInfoFiler.method: "方法",
     requestInfoFiler.path: "接口请求路径",
