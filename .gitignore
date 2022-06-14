@@ -10,3 +10,4 @@ logs
 templates
 case_plan/migrations/
 .DS_Store
+/config/yapi_config.py
