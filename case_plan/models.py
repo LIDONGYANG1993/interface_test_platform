@@ -145,7 +145,8 @@ class calculaterModel(publicModel):
 class requestInfoModel(publicModel):
     related_name = "onStep"
     name = models.CharField(requestInfoReplace[requestInfoFiler.name], max_length=500, default=None, blank=False)
-    host = models.CharField(requestInfoReplace[requestInfoFiler.host], max_length=200, default="", blank=True)
+    doc_url = models.URLField(requestInfoReplace[requestInfoFiler.doc_url], max_length=500, default="", blank=True)
+    host = models.URLField(requestInfoReplace[requestInfoFiler.host], max_length=200, default="", blank=True)
     path = models.CharField(requestInfoReplace[requestInfoFiler.path], max_length=200, default="", blank=False)
     method = models.CharField(requestInfoReplace[requestInfoFiler.method], max_length=5,
                               choices=publicModel.methodTypeChoices.choices,

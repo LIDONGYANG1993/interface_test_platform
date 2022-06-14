@@ -134,6 +134,7 @@ class requestInfoFiler:
 
     method = "method"  # 请求方法
     params = "params"  # 参数
+    doc_url = "params"  # 参数
 
     headers = "headers"
     data = "data"

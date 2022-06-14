@@ -1,6 +1,7 @@
 from django.contrib import admin
-from django.db.models import JSONField
+from django.db.models import JSONField,URLField
 from django_json_widget.widgets import JSONEditorWidget
+from django.contrib.admin.widgets import AdminURLFieldWidget
 from fieldsets_with_inlines import FieldsetsInlineMixin
 from import_export.admin import ImportExportModelAdmin
 from import_export.formats import base_formats
@@ -92,10 +93,10 @@ class stepLine(InlineActionsMixin, DefaultActionsMixin, publicLine):
 @admin.register(requestInfoModel)
 class requestInfoAdmin(publicAdmin):
     change_list_template = "admin/change_list_import.html"
-    list_display = ("id", 'name', 'path', 'params')
+    list_display = ("id", 'name', 'path', 'params', "doc_url")
     fieldsets_with_inlines = [
         (None, {'fields': ['name']}),
-        ('基本信息', {'fields': ["host", "path"]}),
+        ('基本信息', {'fields': ["doc_url","host", "path"]}),
         ("参数集", {"fields": ["params"]}),
     ]
     search_fields = ["name", "id", "path"]

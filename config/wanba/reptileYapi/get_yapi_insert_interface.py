@@ -36,7 +36,8 @@ class Interface:
             path=self.make_path(yapi_interface),
             method=self.make_method(yapi_interface),
             name=self.make_name(yapi_interface),
-            params=self.make_params(yapi_interface)
+            params=self.make_params(yapi_interface),
+            doc_url=self.make_doc_url(yapi_interface)
         )
 
     @staticmethod
@@ -46,6 +47,11 @@ class Interface:
     @staticmethod
     def make_method(yapi_interface:dict):
         return yapi_interface.get("method", None)
+
+
+    @staticmethod
+    def make_doc_url(yapi_interface:dict):
+        return yapi_interface.get("documentUrl", None)
 
     @staticmethod
     def make_name(yapi_interface:dict):

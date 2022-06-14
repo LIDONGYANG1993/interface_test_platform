@@ -55,6 +55,7 @@ requestInfoReplace= {
     requestInfoFiler.host: "接口请求host",
     requestInfoFiler.params: "默认参数",
     requestInfoFiler.headers: "headers",
+    requestInfoFiler.doc_url: "文档地址",
     stepFiler.dataId: "编号"
 }
 
