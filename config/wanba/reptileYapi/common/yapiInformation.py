@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # @Date  : 2021/8/16
 # @Name  : 杨望宇
-
+from config.yapi_config import host_yapi
 import json
 import time
 
@@ -53,8 +53,9 @@ def version_set(timeStamp):
 class yapiInformation:
 
     def __init__(self, user=None, password=None):
-        self.url = 'http://yapi.wb-intra.com{}'
-        self.yapiUrl = 'http://yapi.wb-intra.com/project/{}/interface/api/{}'
+        self.host = host_yapi
+        self.url = self.host + '{}'
+        self.yapiUrl = self.host + '/project/{}/interface/api/{}'
         self.user = user
         self.password = password
         self.errors = []

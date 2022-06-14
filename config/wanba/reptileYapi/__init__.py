@@ -1,5 +1,5 @@
 
-from config.yapi_config import yapi_name, yapi_pwd
+from config.yapi_config import yapi_name, yapi_pwd, host_yapi
 import django
 django.setup()
 
