@@ -26,7 +26,10 @@ class publicAdmin(FieldsetsInlineMixin, InlineActionsModelAdminMixin, ImportExpo
     search_fields = ["name", "id"]  # 搜索字段
     empty_value_display = '无'  # 默认空值展示字段
     list_select_related = False  # 开启关系型搜索
-    list_per_page = 50
+    list_per_page = 20 # 分页数量
+    ordering = ["id", "name"]  # 排序字段
+
+    show_full_result_count = True  # 关闭显示总数
 
     formfield_overrides = {
         JSONField: {'widget': JSONEditorWidget(height="350px")},
@@ -88,6 +91,7 @@ class stepLine(InlineActionsMixin, DefaultActionsMixin, publicLine):
     model = stepModel
     exclude = ["params", ]
     sortable_field_name = "stepNumber"
+    autocomplete_fields = ["requestInfo",]
 
 
 @admin.register(requestInfoModel)
@@ -100,6 +104,7 @@ class requestInfoAdmin(publicAdmin):
         ("参数集", {"fields": ["params"]}),
     ]
     search_fields = ["name", "id", "path"]
+    ordering = ["name"]
 
 
 @admin.register(stepModel)
