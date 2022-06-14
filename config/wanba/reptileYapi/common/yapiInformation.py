@@ -74,7 +74,8 @@ class yapiInformation:
             self.errors.append(dict(url=url, params=body, error=e))
             return None
 
-    def read_headers(self, req_headers: list):
+    @staticmethod
+    def read_headers(req_headers: list):
         res = {}
         try:
             for rel in req_headers:
@@ -83,14 +84,23 @@ class yapiInformation:
             return None
         return res
 
-    def read_params(self, body_str: str):
+    @staticmethod
+    def read_params(body_str: str):
         try:
             res = json.loads(body_str)
         except Exception as e:
             return None
         return res
 
-    def dict_key_get(self, key, _dict):
+    @staticmethod
+    def read_params_list(body_list: list):
+        res = {}
+        for body in body_list:
+            res[body["name"]] = {"type":body["type"], "desc":body["desc"]}
+        return {"properties":res}
+
+    @staticmethod
+    def dict_key_get(key, _dict):
         if _dict.__contains__(key):
             return _dict[key]
         else:
@@ -311,10 +321,11 @@ class yapiInformation:
             _interface.result = self.read_params(res['res_body'])
         if res.__contains__('req_body_other'):
             _interface.body = self.read_params(res['req_body_other'])
+        elif res.__contains__('req_body_form'):
+            _interface.body = self.read_params_list(res['req_body_form'])
         if res.__contains__('req_headers'):
             _interface.headers = self.read_headers(res['req_headers'])
         res_interface = class_to_dict(_interface)
-        print(res_interface['path'], res_interface['name'])
         return res_interface
 
 

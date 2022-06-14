@@ -17,3 +17,4 @@ class response:
     result = {"code": 0, "msg": "访问成功！", "data": {}}
     request_error = {"code": -10000, "msg": "访问接口异常，请检查参数！", "data": {}}
     params_error = {"code": -10001, "msg": "缺少必要参数！", "data": {}}
+    cat_id_error = {"code": -20001, "msg": "找不到对应cat_id！", "data": {}}

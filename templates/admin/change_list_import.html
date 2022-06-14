@@ -1,0 +1,14 @@
+{% extends 'admin/change_list.html' %}
+{% block object-tools %}
+  <div>
+    <form action="../../../run/update/interface/byCat" method="POST" target="_blank">
+        <label>
+            {% csrf_token %}
+            <input type="text" name="cat_id" value="">
+        </label>
+        <button type="submit">从yapi中导入</button>
+    </form>
+  </div>
+  <br />
+  {{ block.super }}
+{% endblock %}

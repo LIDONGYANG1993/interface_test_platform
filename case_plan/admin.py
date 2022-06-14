@@ -91,6 +91,7 @@ class stepLine(InlineActionsMixin, DefaultActionsMixin, publicLine):
 
 @admin.register(requestInfoModel)
 class requestInfoAdmin(publicAdmin):
+    change_list_template = "admin/change_list_import.html"
     list_display = ("id", 'name', 'path', 'params')
     fieldsets_with_inlines = [
         (None, {'fields': ['name']}),

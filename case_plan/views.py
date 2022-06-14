@@ -54,9 +54,18 @@ def run_step_by_id(request):
 def update_interface_by_cat(request):
     result = response.result
     request: django.http.request.HttpRequest
-    data = request.GET
-    cat_id = data.get("cat_id", None)
-    if not cat_id:
+    data_get = request.GET
+    data_post = request.POST
+    cat_id_get = data_get.get("cat_id", None)
+    cat_id_post = data_post.get("cat_id", None)
+    if not (cat_id_get or cat_id_post):
         return JsonResponse(response.params_error)
-    result.update({"data":Interface().import_data_by_cat(cat_id)})
+    cat_id = cat_id_get if cat_id_get else cat_id_post
+    inter = Interface()
+    res_get = inter.import_data_by_cat(cat_id)
+    if res_get[0]:
+        result.update({"data":res_get[1]})
+    else:
+        return JsonResponse(response.cat_id_error)
+
     return JsonResponse(result)

@@ -9,7 +9,7 @@ from case_plan.models import requestInfoModel
 
 class Interface:
     def __init__(self):
-        self.yapi = yapiInformation(yapi_name, yapi_user)
+        self.yapi = yapiInformation(yapi_name,yapi_pwd)
         self.projects = []
         self.cats = []
         self.interfaces = []
@@ -66,7 +66,10 @@ class Interface:
         success = []
         fail = []
         exited = []
-        face = self.get_cat_interface(cat_id)
+        try:
+            face = self.get_cat_interface(cat_id)
+        except Exception as e:
+            return False,  {"success": success, "fail": fail, "exited": exited}
         for face_rel in face:
             try:
                 if self.get_from_database(face_rel.get("path")):
@@ -77,10 +80,9 @@ class Interface:
                 fail.append(self.get_dict(face_rel))
                 continue
             success.append(self.get_dict(face_rel))
-        return {"success": success, "fail": fail, "exited": exited}
+        return True, {"success": success, "fail": fail, "exited": exited}
 
 
 if __name__ == '__main__':
     run = Interface()
-    print(run.import_data_by_cat(8003))
     pass
