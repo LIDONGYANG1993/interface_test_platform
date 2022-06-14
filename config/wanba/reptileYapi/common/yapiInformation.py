@@ -55,7 +55,7 @@ class yapiInformation:
     def __init__(self, user=None, password=None):
         self.host = host_yapi
         self.url = self.host + '{}'
-        self.yapiUrl = self.host + '/project/{}/interface/api/{}'
+        self.yapiUrl = 'http://yapi.wb-intra.com/project/{}/interface/api/{}'
         self.user = user
         self.password = password
         self.errors = []
