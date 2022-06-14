@@ -49,3 +49,8 @@ class privateInterFace:
             "envsType": envsType
         }
         return requests.get(self.url_getOnlineToken, params=body, headers=header)
+
+
+if __name__ == '__main__':
+    a = privateInterFace().getTicket("liqi123","123456", "1231231",False).json()
+    print(a)

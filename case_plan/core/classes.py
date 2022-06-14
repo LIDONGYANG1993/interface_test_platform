@@ -7,14 +7,15 @@ import datetime
 import os.path
 import threading
 from copy import deepcopy
-from config.wanba.interfaceRequest import get_token, app_request, assert_token_test
-from config.casePlan import defaultParams
+from config.wanba.interfaceRequest import get_token, app_request, assert_token
 import requests
 from requests import Response
 from config.casePlan.yamlFilersZh import *
 from case_plan.core.func import *
 from case_plan.models import publicModel
 from config.logger import Logger, project_path
+from case_plan.core.data import defaultData
+
 
 asserts_used = []
 
@@ -206,7 +207,7 @@ class calculaterDone(publicDone):
 
     @staticmethod
     def get_number(number):  # 如果数字是整形，则返回整形，否则返回浮点型
-        return int(number) if number == int(number) else number
+        return int(number) if float(number) == int(number) else float(number)
 
     # 全局变量的替换
     def replace_in_calculater(self):
@@ -401,7 +402,7 @@ class requestDone(publicDone):
                                                                  self.params), )
 
         self.replace_in_requestInfo()  # 访问接口之前，执行参数替换
-        self.token = get_token(self.params, self.environment)
+        get_token(self.params, self.environment)
         if self.host:
             self.request_for_public()  # 如果host存在，不执行环境配置，直接请求
         else:
@@ -428,10 +429,13 @@ class requestDone(publicDone):
             self.error = True
             self.code = 99999
             self.response_json = None
-
         elif self.response.status_code != 200:  # 校验code
             self.error = True
             self.code = self.response.status_code
+            self.response_json = None
+        elif "__terror" in self.response.json():  # 校验code
+            self.error = True
+            self.code = 99998
             self.response_json = None
         else:
             self.error = False
@@ -441,7 +445,7 @@ class requestDone(publicDone):
     # 如果玩吧token失效，重新获取token，并重新执行request，仅校验一次
     def assert_wanba(self):
         if self.error is True: return
-        if self.response.json()["code"] == 10202 or self.response.json()["code"] == 3:
+        if self.response.json()["code"] == 3:
             get_token(self.params, self.environment)
             self.request()
             self.asserts()
@@ -470,6 +474,7 @@ class requestDone(publicDone):
 
     # 当独立运行requestInfo时，使用配置好的默认环境--此处原本设计为从数据库中读取，暂未实现
     def get_environment(self):
+        defaultParams = defaultData(dataId=1).data_dict
         if not self.step: return defaultParams
         if not self.step.case: return defaultParams
         if not self.step.case.plan: return defaultParams
@@ -612,6 +617,8 @@ class stepDone(publicDone):
             the_logger.debug("START-EXTRACTOR: {} {} {} == {}".format(calculater.variable1, calculater.calFunction,
                                                                       calculater.variable2, calculater.result))
             self.calculator_result.update({calculater.name: calculater.result})
+            if calculater.result is None:
+                print(self.calculator_result)
             self.calculator_result_for_api.append(calculater.calculater_for_api())
 
     # 在步骤中执行验证器
@@ -626,7 +633,7 @@ class stepDone(publicDone):
                 self.fail = True
             else:
                 self.fail = False
-            self.asserts_result.append( # 收集验证器的信息
+            self.asserts_result.append(  # 收集验证器的信息
                 {assertsFiler.assertStr: asserts.asserts_str, assertsFiler.result: asserts.result})
             self.asserts_result_for_api.append(asserts.asserts_result_for_api())
         return
@@ -775,7 +782,7 @@ class caseDone(publicDone):
             self.extractor_result.update(step.extractor_result)
             self.calculater_result.update(step.calculator_result)
             self.step_result_for_api.append(step.result_for_api())
-            if not (step.error is False) or not (step.fail is False): # 如果实行失败或者异常，标记用例失败
+            if not (step.error is False) or not (step.fail is False):  # 如果实行失败或者异常，标记用例失败
                 self.fail = True
             else:
                 self.fail = False

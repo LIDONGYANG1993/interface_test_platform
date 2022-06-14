@@ -8,12 +8,14 @@ from .models import *
 from inline_actions.admin import InlineActionsMixin
 from inline_actions.admin import InlineActionsModelAdminMixin
 from inline_actions.actions import DefaultActionsMixin
+
 # Register your models here.
 
 # 配置标题
 admin.site.site_title = "接口场景化平台"
 admin.site.site_header = "接口场景化平台"
 admin.site.index_title = "接口场景化平台"
+
 
 # 公共类型
 class publicAdmin(FieldsetsInlineMixin, InlineActionsModelAdminMixin, ImportExportModelAdmin):
@@ -109,12 +111,11 @@ class stepAdmin(publicAdmin):
     ]
     inlines = []
     autocomplete_fields = ["case", "requestInfo"]
-    list_display = ("id", "stepNumber", "case","name", "create_user", "update_user", "created_time", "updated_time")
+    list_display = ("id", "stepNumber", "case", "name", "create_user", "update_user", "created_time", "updated_time")
     search_fields = ["name", "id", "case__name"]
     formfield_overrides = {
         JSONField: {'widget': JSONEditorWidget(height=150)},
     }
-
 
 
 @admin.register(caseModel)
@@ -146,15 +147,6 @@ class planAdmin(publicAdmin):
         "created_time",
         "updated_time")
     autocomplete_fields = ["case", ]
-
-# @admin.register(tokenModel)
-# class tokenAdmin(publicAdmin):
-#     list_display = ["uid","token"]
-#     list_display_links = ["uid","token"]
-#     fieldsets_with_inlines = [
-#         (None, {'fields': ['uid']}),
-#         (None, {'fields': ["token",]})
-#     ]
 
 
 # @admin.register(assertsModel)
@@ -198,5 +190,15 @@ class planAdmin(publicAdmin):
 # class defaultAdmin(publicAdmin):
 #     fieldsets_with_inlines = [
 #         (None, {'fields': ['name']}),
-#         (None, {'fields': ["value",]})
-# ]
+#         (None, {'fields': ["value", ]})
+#     ]
+#
+#
+# @admin.register(tokenModel)
+# class tokenAdmin(publicAdmin):
+#     list_display = ["uid", "token", "environment", "app_type"]
+#     list_display_links = ["uid", "token", "environment"]
+#     fieldsets_with_inlines = [
+#         (None, {'fields': ['uid']}),
+#         (None, {'fields': ["token", "environment", "app_type"]})
+#     ]

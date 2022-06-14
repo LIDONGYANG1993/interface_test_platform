@@ -41,7 +41,12 @@ class publicData:
         return self.model.objects.filter(id=self.dataId)
 
     def get_data(self):
-        pass#
+        pass
+
+    def get_model(self, model):
+        self.model_data = model
+        self.data_dict = self.get_data()
+        return self
 
 # 计划
 class planData(publicData):
@@ -65,16 +70,16 @@ class planData(publicData):
 
     def get_case_data(self):
         res_data_list = []
-        for case in self.model_data.case.filter():
-            case: caseModel
-            res_data_list.append(caseData(dataId=case.id).data_dict)
+        for data_model in self.model_data.case.filter():
+            data_model: caseModel
+            res_data_list.append(caseData().get_model(data_model).data_dict)
         return res_data_list
 
     def get_variable_data(self):
         res_data_list = []
-        for variable in self.model_data.variable.filter():
-            variable: variableModel
-            res_data_list.append(variableData(dataId=variable.id).data_dict)
+        for data_model in self.model_data.variable.filter():
+            data_model: variableModel
+            res_data_list.append(variableData().get_model(data_model).data_dict)
         return res_data_list
 
     def get_default_data(self):
@@ -106,21 +111,21 @@ class caseData(publicData):
         res_data_list = []
         for data_model in self.model_data.variable_case.filter():
             data_model: variableModel
-            res_data_list.append(variableData(dataId=data_model.id).data_dict)
+            res_data_list.append(variableData().get_model(data_model).data_dict)
         return res_data_list
 
     def get_asserts_data(self):
         res_data_list = []
         for data_model in self.model_data.assertsmodel_set.filter():
             data_model: variableModel
-            res_data_list.append(assertData(dataId=data_model.id).data_dict)
+            res_data_list.append(assertData().get_model(data_model).data_dict)
         return res_data_list
 
     def get_step_data(self):
         res_data_list = []
         for data_model in self.model_data.step.filter():
             data_model: variableModel
-            res_data_list.append(stepData(dataId=data_model.id).data_dict)
+            res_data_list.append(stepData().get_model(data_model).data_dict)
         return res_data_list
 
     def new_case(self, data_model):
@@ -132,7 +137,7 @@ class stepData(publicData):
     model_data: stepModel
     filer = stepFiler
 
-    def __init__(self, dataId):
+    def __init__(self, dataId=None):
         super().__init__(stepModel, dataId)
 
     def get_data(self):
@@ -160,21 +165,21 @@ class stepData(publicData):
         res_data_list = []
         for data_model in self.model_data.assertsmodel_set.filter():
             data_model: assertsModel
-            res_data_list.append(assertData(dataId=data_model.id).data_dict)
+            res_data_list.append(assertData().get_model(data_model).data_dict)
         return res_data_list
 
     def get_extractor_data(self):
         res_data_list = []
         for data_model in self.model_data.extractormodel_set.filter():
             data_model: extractorModel
-            res_data_list.append(extractorData(dataId=data_model.id).data_dict)
+            res_data_list.append(extractorData().get_model(data_model).data_dict)
         return res_data_list
 
     def get_calculator_data(self):
         res_data_list = []
         for data_model in self.model_data.calculatermodel_set.filter():
             data_model: variableModel
-            res_data_list.append(calculaterData(dataId=data_model.id).data_dict)
+            res_data_list.append(calculaterData().get_model(data_model).data_dict)
         return res_data_list
 
     def request_in_step(self):
@@ -217,7 +222,7 @@ class variableData(publicData):
     model_data: variableModel
     filer = variableFiler
 
-    def __init__(self, dataId):
+    def __init__(self, dataId=None):
         super().__init__(variableModel, dataId)
 
     def get_data(self):
@@ -236,7 +241,7 @@ class extractorData(publicData):
     model_data: extractorModel
     filer = extractorFiler
 
-    def __init__(self, dataId):
+    def __init__(self, dataId=None):
         super().__init__(extractorModel, dataId)
 
     def get_data(self):
@@ -256,7 +261,7 @@ class calculaterData(publicData):
     model_data: calculaterModel
     filer = calculatorFiler
 
-    def __init__(self, dataId):
+    def __init__(self, dataId=None):
         super().__init__(calculaterModel, dataId)
 
     def get_data(self):
@@ -277,7 +282,7 @@ class assertData(publicData):
     model_data: assertsModel
     filer = assertsFiler
 
-    def __init__(self, dataId):
+    def __init__(self, dataId=None):
         super().__init__(assertsModel, dataId)
 
     def get_data(self):
@@ -336,6 +341,5 @@ class tokenData(publicData):
 
 
 if __name__ == '__main__':
-    res = caseData(dataId=1)
+    res = caseData(dataId=2)
     print(json.dumps(res.data_dict, ensure_ascii=False))
-    pass
