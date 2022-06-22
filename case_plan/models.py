@@ -1,19 +1,20 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from config.casePlan.yamlFilersZh import *
-
+from case_plan.manager import PropertyManager
 
 # Create your models here
 
 
 class publicModel(models.Model):
-    related_name = "public"
     created_time = models.DateTimeField(verbose_name="创建时间", auto_now=True)  # 创建时间
     updated_time = models.DateTimeField(verbose_name="更新时间", auto_now_add=True)  # 更新时间
 
     create_user = models.CharField(verbose_name="创建者", max_length=100, blank=True, editable=False)
     update_user = models.CharField(verbose_name="更新者", max_length=100, blank=True, editable=False)
-    is_use = models.BooleanField("是否可用", default=True, editable=False, blank=True)
+    is_deleted = models.BooleanField("0-软删除", default=False, editable=True, blank=False)
+
+    objects = PropertyManager()
 
     # 类型选择器
     class typeChoices(models.TextChoices):
@@ -56,12 +57,8 @@ class publicModel(models.Model):
         abstract = True
         ordering = ['created_time', "updated_time"]
 
-    def get_related_name_update_user(self):
-        return self.related_name + "update_user"
-
 
 class defaultModel(publicModel):
-    related_name = "default"
     name = models.CharField(configReplace[configFiler.name], max_length=100, default="environment", blank=False)
     value = models.JSONField(configReplace[configFiler.value], max_length=500, default=dict, blank=True)
 
@@ -70,7 +67,6 @@ class defaultModel(publicModel):
 
 
 class variableModel(publicModel):
-    related_name = "variable"
     name = models.CharField(variableReplace[variableFiler.name], max_length=500, default=None, blank=False)  # 变量名称
     plan = models.ForeignKey("planModel", verbose_name=variableReplace[variableFiler.plan], on_delete=models.CASCADE,
                              default=None, blank=True, null=True, editable=False, related_name="variable")
@@ -87,7 +83,6 @@ class variableModel(publicModel):
 
 
 class extractorModel(publicModel):
-    related_name = "extractor"
     step = models.ForeignKey("stepModel", verbose_name=extractorReplace[extractorFiler.step], unique=False,
                              on_delete=models.SET_NULL, blank=False, editable=False, null=True)
     name = models.CharField(extractorReplace[extractorFiler.name], max_length=100, default="CODE", blank=False)
@@ -104,7 +99,6 @@ class extractorModel(publicModel):
 
 
 class assertsModel(publicModel):
-    related_name = "asserts"
     name = models.CharField(assertsReplace[assertsFiler.value1], max_length=100, default="{{CODE}}", blank=False)
 
     step = models.ForeignKey("stepModel", verbose_name=extractorReplace[extractorFiler.step], unique=False,
@@ -124,7 +118,6 @@ class assertsModel(publicModel):
 
 
 class calculaterModel(publicModel):
-    related_name = "calculater"
     name = models.CharField(calculatorReplace[calculatorFiler.name], max_length=100, default="variable0", blank=False)
     step = models.ForeignKey("stepModel", verbose_name=calculatorReplace[calculatorFiler.step], unique=False,
                              on_delete=models.CASCADE)
@@ -143,7 +136,6 @@ class calculaterModel(publicModel):
 
 
 class requestInfoModel(publicModel):
-    related_name = "onStep"
     name = models.CharField(requestInfoReplace[requestInfoFiler.name], max_length=500, default=None, blank=False)
     doc_url = models.URLField(requestInfoReplace[requestInfoFiler.doc_url], max_length=500, default="", blank=True)
     host = models.URLField(requestInfoReplace[requestInfoFiler.host], max_length=200, default="", blank=True)
@@ -185,7 +177,6 @@ class stepModel(publicModel):
 
 
 class caseModel(publicModel):
-    related_name = "case"
     name = models.CharField(caseReplace[caseFiler.name], max_length=500, default=None, blank=False)
     model = models.CharField(caseReplace[caseFiler.model], max_length=100, default=None, blank=True)
 
@@ -205,8 +196,6 @@ class caseModel(publicModel):
 
 
 class planModel(publicModel):
-    related_name = "plan"
-
     name = models.CharField(planReplace[planFiler.name], max_length=500, default=None, blank=False)
     environment_and_type = models.ForeignKey("defaultModel", on_delete=models.SET_NULL, null=True,
                                              verbose_name=planReplace[planFiler.environment], max_length=5, default=1)
@@ -230,8 +219,18 @@ class planModel(publicModel):
 
 
 class tokenModel(publicModel):
-    related_name = "token"
     uid = models.CharField(max_length=100, default=None, blank=False)
     environment = models.CharField(max_length=100, default=None, blank=True, null=True)
     app_type = models.CharField(max_length=100, default=None, blank=True, null=True)
     token = models.JSONField(max_length=100, default=None, blank=True, null=True)
+
+
+class reportModel(publicModel):
+    plan = models.ForeignKey(planModel, verbose_name="源计划", blank=False, on_delete=models.DO_NOTHING)
+    pass_count = models.IntegerField(verbose_name="通过", blank=False, default=0, editable=False)
+    fail_count = models.IntegerField(verbose_name="失败", blank=False, default=0, editable=False)
+    error_count = models.IntegerField(verbose_name="异常", blank=False, default=0, editable=False)
+    pass_list = models.ManyToManyField(caseModel, verbose_name="通过列表", blank=True, editable=False,related_name="count")
+    fail_list = models.ManyToManyField(caseModel, verbose_name="失败列表", blank=True, editable=False,related_name="fail")
+    error_list = models.ManyToManyField(caseModel, verbose_name="异常列表", blank=True, editable=False,related_name="error")
+    msg = models.CharField(max_length=1000, default=None, blank=True, null=True)

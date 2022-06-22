@@ -7,7 +7,7 @@ import datetime
 import os.path
 import threading
 from copy import deepcopy
-from config.wanba.interfaceRequest import get_token, app_request, assert_token
+from config.wanba.interfaceRequest import get_token, app_request
 import requests
 from requests import Response
 from config.casePlan.yamlFilersZh import *
@@ -16,6 +16,7 @@ from case_plan.models import publicModel
 from config.logger import Logger, project_path
 from case_plan.core.data import defaultData
 
+from case_plan.models import reportModel
 
 asserts_used = []
 
@@ -916,6 +917,22 @@ class planDone(publicDone):
             )
         return res
 
+class reportDone:
+    def __init__(self, plan_id):
+        self.plan_id = plan_id
+        self.modelData = None
+
+
+    def new_report(self):
+        self.modelData = reportModel.objects.create(plan_id=self.plan_id)
+
+    def del_report(self):
+        self.modelData: reportModel.objects
+        self.modelData.delete()
+
+    def test_report(self):
+        self.modelData: reportModel.objects
+        self.modelData = None
 
 def responseDoneTest():
     res = extractorDone({extractorFiler.value: "a.b.0.e.0.z", "condition": '{"c":10},{"w": "12"}'})
@@ -978,4 +995,5 @@ def requestDoneTest():
 
 
 if __name__ == '__main__':
-    planDoneTest()
+    rep = reportDone(1)
+    pass

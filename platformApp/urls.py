@@ -15,10 +15,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.template.defaulttags import url
-from django.urls import path
+from django.urls import path, include
 from case_plan.urls import debug_url
 
 urlpatterns = [
+    # path('grappelli/', include('grappelli.urls')),
     path('admin/', admin.site.urls),
     path('run/', debug_url(), )
 

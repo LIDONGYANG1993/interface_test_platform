@@ -24,30 +24,30 @@
 {% endif %}
 
 {% block content %}<div id="content-main">
+
 {% block object-tools %}
 {% if change %}{% if not is_popup %}
-  <ul class="object-tools">
+    <ul class="object-tools">
     {% block object-tools-items %}
       {% change_form_object_tools %}
     {% endblock %}
-  </ul>
-{% endif %}{% endif %}
-{% endblock %}
+
+    {% block object-tools-items-debug %}
     <! 增加调试功能 ul>
-    <ul class="object-tools">
-        {% if opts.label == 'case_plan.stepModel' or opts.label == 'case_plan.caseModel' or opts.label == 'case_plan.planModel' or opts.label == 'case_plan.requestInfoModel' %}
-            {% block object-debug %}
-                <div class="content-main object-tools">
+    {% if opts.label == 'case_plan.stepModel' or opts.label == 'case_plan.caseModel' or opts.label == 'case_plan.planModel' or opts.label == 'case_plan.requestInfoModel' %}
+        <li>
                     <form action="/run/{{ opts.model_name }}" method="GET" target="_blank">
                         <input type="hidden" name="data_id" value="{{ original.id}}">
-                        <button type="submit" class="submit-row">调试</button>
+                        <button type="submit" class="button-row" >调试</button>
                     </form>
-                </div>
-                <br />
                 {{ block.super }}
-            {% endblock %}
-        {% endif %}
-  </ul>
+        </li>
+    {% endif %}
+    {% endblock %}
+    </ul>
+
+{% endif %}{% endif %}
+{% endblock %}
 <form {% if has_file_field %}enctype="multipart/form-data" {% endif %}{% if form_url %}action="{{ form_url }}" {% endif %}method="post" id="{{ opts.model_name }}_form" novalidate>{% csrf_token %}{% block form_top %}{% endblock %}
 <div>
 {% if is_popup %}<input type="hidden" name="{{ is_popup_var }}" value="1">{% endif %}

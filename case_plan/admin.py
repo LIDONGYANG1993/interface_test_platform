@@ -9,7 +9,6 @@ from .models import *
 from inline_actions.admin import InlineActionsMixin
 from inline_actions.admin import InlineActionsModelAdminMixin
 from inline_actions.actions import DefaultActionsMixin
-
 # Register your models here.
 
 # 配置标题
@@ -26,7 +25,7 @@ class publicAdmin(FieldsetsInlineMixin, InlineActionsModelAdminMixin, ImportExpo
     search_fields = ["name", "id"]  # 搜索字段
     empty_value_display = '无'  # 默认空值展示字段
     list_select_related = False  # 开启关系型搜索
-    list_per_page = 20 # 分页数量
+    list_per_page = 20  # 分页数量
     ordering = ["id", "name"]  # 排序字段
 
     show_full_result_count = True  # 关闭显示总数
@@ -59,6 +58,7 @@ class publicAdmin(FieldsetsInlineMixin, InlineActionsModelAdminMixin, ImportExpo
 
 class publicLine(admin.TabularInline):
     extra = 0
+    can_delete = False
     template = "change/tabular.html"
 
 
@@ -97,7 +97,7 @@ class stepLine(InlineActionsMixin, DefaultActionsMixin, publicLine):
 @admin.register(requestInfoModel)
 class requestInfoAdmin(publicAdmin):
     change_list_template = "admin/change_list_import.html"
-    list_display = ("id", 'name', 'path', 'params', "doc_url")
+    list_display = ("id", 'name', 'path', 'params', "doc_url",)
     fieldsets_with_inlines = [
         (None, {'fields': ['name']}),
         ('基本信息', {'fields': ["doc_url","host", "path"]}),
@@ -118,7 +118,7 @@ class stepAdmin(publicAdmin):
     ]
     inlines = []
     autocomplete_fields = ["case", "requestInfo"]
-    list_display = ("id", "stepNumber", "case", "name", "create_user", "update_user", "created_time", "updated_time")
+    list_display = ("id", "stepNumber", "case", "name", "created_time", "updated_time")
     search_fields = ["name", "id", "case__name"]
     formfield_overrides = {
         JSONField: {'widget': JSONEditorWidget(height=150)},
@@ -209,3 +209,10 @@ class planAdmin(publicAdmin):
 #         (None, {'fields': ['uid']}),
 #         (None, {'fields': ["token", "environment", "app_type"]})
 #     ]
+
+@admin.register(reportModel)
+class defaultAdmin(publicAdmin):
+    list_display = ["id", ]
+    ordering = []
+    list_display_links = ["id",]
+    fieldsets_with_inlines = []
