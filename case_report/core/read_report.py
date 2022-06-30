@@ -323,7 +323,7 @@ class assertReportData(publicReportData):
 # 默认数据
 class defaultReportData(publicReportData):
     model_data: defaultReportModel
-    filer = default
+    filer = defaultFiler
 
     def __init__(self, dataId=None):
         super().__init__(defaultReportModel, dataId)

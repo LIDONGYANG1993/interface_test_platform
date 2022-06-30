@@ -867,6 +867,9 @@ class caseDone(publicDone):
         self.msg = msg
 
 class defaultDone(publicDone):
+    filter = defaultFiler
+
+
     def __init__(self, data):
         super().__init__(data)
         self.name = self.get_name
@@ -874,13 +877,18 @@ class defaultDone(publicDone):
 
     @property
     def get_name(self):
-        return self._get_value(configReplace[default.name])
+        return self._get_value(defaultFiler.name)
 
     @property
     def get_value(self):
-        return self._get_value(configReplace[default.value])
+        return self._get_value(defaultFiler.value)
 
 
+    def result_for_api(self):
+        return {
+            self.filter.name:self.name,
+            self.filter.value:self.value,
+        }
 
 
 # 计划Done类
@@ -913,8 +921,8 @@ class planDone(publicDone):
 
     @property
     def get_default(self):
-        parents = {default.plan: self}
-        return make_class(self._get_value(planFiler.environment), defaultDone, default.used, parents)
+        parents = {defaultFiler.plan: self}
+        return make_class(self._get_value(planFiler.environment), defaultDone, defaultFiler.used, parents)
 
     @property
     def get_case_list(self):
@@ -961,7 +969,7 @@ class planDone(publicDone):
         return {
             planFiler.name: self.name,
             planFiler.dataId: self.get_data_id,
-            planFiler.environment: self.default,
+            planFiler.environment: self.default.result_for_api(),
             planFiler.caseList: self.case_result_for_api,
             "msg": self.msg
 

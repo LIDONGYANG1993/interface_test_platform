@@ -111,10 +111,10 @@ assertsReplace = {
     assertsFiler.dataId: "编号",
 }
 
-configReplace = {
+defaultReplace = {
 
-    default.name: "配置参数名称",
-    default.value: "配置值",
-    default.isUse: "是否可用",
-    default.dataId: "编号",
+    defaultFiler.name: "配置参数名称",
+    defaultFiler.value: "配置值",
+    defaultFiler.isUse: "是否可用",
+    defaultFiler.dataId: "编号",
 }

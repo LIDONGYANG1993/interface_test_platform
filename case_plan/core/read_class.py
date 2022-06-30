@@ -307,7 +307,7 @@ class assertData(publicData):
 # 默认数据
 class defaultData(publicData):
     model_data: defaultModel
-    filer = default
+    filer = defaultFiler
 
     def __init__(self, dataId=None):
         super().__init__(defaultModel, dataId)

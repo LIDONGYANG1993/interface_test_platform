@@ -53,8 +53,8 @@ class requestInfoReportModel(publicReportModel):
 
 class defaultReportModel(publicModel):
     from_data = models.ForeignKey(defaultModel, verbose_name="源环境信息", default=None, blank=True, on_delete=models.SET_NULL, null=True)
-    name = models.CharField(configReplace[default.name], max_length=100, default="environment", blank=True)
-    value = models.JSONField(configReplace[default.value], default=dict, blank=True)
+    name = models.CharField(defaultReplace[defaultFiler.name], max_length=100, default="environment", blank=True)
+    value = models.JSONField(defaultReplace[defaultFiler.value], default=dict, blank=True)
 
     def __str__(self):
         return "{}".format(self.name)

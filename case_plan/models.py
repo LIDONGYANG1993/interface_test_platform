@@ -59,8 +59,8 @@ class publicModel(models.Model):
 
 
 class defaultModel(publicModel):
-    name = models.CharField(configReplace[default.name], max_length=100, default="environment", blank=False)
-    value = models.JSONField(configReplace[default.value], max_length=500, default=dict, blank=True)
+    name = models.CharField(defaultReplace[defaultFiler.name], max_length=100, default="environment", blank=False)
+    value = models.JSONField(defaultReplace[defaultFiler.value], max_length=500, default=dict, blank=True)
 
     def __str__(self):
         return "{}".format(self.name)

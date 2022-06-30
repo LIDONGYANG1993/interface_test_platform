@@ -209,7 +209,7 @@ class calculatorFiler:
     updateTime = "updateTime"
 
 
-class default:
+class defaultFiler:
     name = "name"  # 提取器存储名称，
     value = "value"  # 变量1
     plan = "plan"  # 关联计划
