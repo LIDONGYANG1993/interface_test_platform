@@ -5,6 +5,7 @@ from case_report import views
 
 url_run_debugging = [
     path('view', views.get_report, ),
+    path('run', views.run_and_report, ),
 
 ]
 

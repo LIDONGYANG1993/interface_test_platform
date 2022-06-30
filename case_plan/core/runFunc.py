@@ -54,7 +54,7 @@ def run_plan_and_report(data_id):
     report.create_report()
     reportData = planReportData()
     reportData.get_model(report.report)
-    return reportData.data_dict
+    return reportData
 
 
 if __name__ == '__main__':

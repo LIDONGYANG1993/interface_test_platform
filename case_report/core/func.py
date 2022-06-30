@@ -4,6 +4,7 @@
 # @Name  : 杨望宇
 import json
 from case_report.models import *
+from case_report.core.config import HOST
 import requests
 import urllib3
 
@@ -21,7 +22,8 @@ def send_ding(url, title, msg, isAtAll=None, atUser=None, atMobiles=None):
     print(res.json())
     return res
 
-def make_report_ding(report:planReportModel):
+
+def make_report_ding(report: planReportModel):
     title = "场景测试报告"
     msg = '-' * 50 + '\n\n' + "日期：{}\n\n" + "计划名称：{}\n\n" + "计划编号：{}\n\n用例总数：{}\n\n<font color='#0eb95e'>通过：{}</font>\n\n<font color='#df0000'>失败：{}</font>\n\n<font color='#df0000'>异常：{}</font>\n\n失败列表：\n\n"
     msg = msg.format(
@@ -35,7 +37,7 @@ def make_report_ding(report:planReportModel):
     )
     case_msg = ""
     for case in report.casereportmodel_set.all():
-        case:caseReportModel
+        case: caseReportModel
         if case.is_pass:
             continue
         _case_msg = '-' * 50 + "\n\n名称：{}\n\n 原因：{}\n\n"
@@ -46,5 +48,12 @@ def make_report_ding(report:planReportModel):
     url = None
     if report.from_data.ding:
         url = report.from_data.ding.ding_url
-    return url, title, msg + case_msg
+    link_msg = "[详情]({})".format(make_report_url(report.id))
+    return url, title, msg + case_msg + link_msg
+
+
+def make_report_url(data_id):
+    host = HOST
+    path = "/report/view"
+    return host + "/report/view" + "?data_id={}".format(data_id)
 

@@ -12,3 +12,4 @@ templates
 .DS_Store
 /config/yapi_config.py
 /static/
+/case_report/core/config.py
