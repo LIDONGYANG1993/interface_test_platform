@@ -59,8 +59,8 @@ class publicModel(models.Model):
 
 
 class defaultModel(publicModel):
-    name = models.CharField(configReplace[configFiler.name], max_length=100, default="environment", blank=False)
-    value = models.JSONField(configReplace[configFiler.value], max_length=500, default=dict, blank=True)
+    name = models.CharField(configReplace[default.name], max_length=100, default="environment", blank=False)
+    value = models.JSONField(configReplace[default.value], max_length=500, default=dict, blank=True)
 
     def __str__(self):
         return "{}".format(self.name)
@@ -69,7 +69,7 @@ class defaultModel(publicModel):
 class variableModel(publicModel):
     name = models.CharField(variableReplace[variableFiler.name], max_length=500, default=None, blank=False)  # 变量名称
     plan = models.ForeignKey("planModel", verbose_name=variableReplace[variableFiler.plan], on_delete=models.CASCADE,
-                             default=None, blank=True, null=True, editable=False, related_name="variable")
+                             default=None, blank=True, null=True, editable=False, related_name="variable_plan")
     case = models.ForeignKey("caseModel", verbose_name=variableReplace[variableFiler.case], on_delete=models.CASCADE,
                              default=None, blank=True, null=True, editable=False, related_name="variable_case")
     value = models.CharField(variableReplace[variableFiler.value], max_length=500, default="", blank=False)  # 变量初始值
@@ -197,8 +197,7 @@ class caseModel(publicModel):
 
 class planModel(publicModel):
     name = models.CharField(planReplace[planFiler.name], max_length=500, default=None, blank=False)
-    environment_and_type = models.ForeignKey("defaultModel", on_delete=models.SET_NULL, null=True,
-                                             verbose_name=planReplace[planFiler.environment], max_length=5, default=1)
+    default = models.ForeignKey("defaultModel", on_delete=models.SET_NULL, null=True, verbose_name=planReplace[planFiler.environment], max_length=5, default=1)
     case = models.ManyToManyField(caseModel, verbose_name=planReplace[planFiler.caseList], default=None, blank=True)
 
     class Meta:
@@ -209,7 +208,7 @@ class planModel(publicModel):
         return "{}".format(self.name)
 
     def val_list_str(self):
-        return [rel for rel in self.variable.all().order_by("name")]
+        return [rel for rel in self.variable_plan.all().order_by("name")]
 
     def case_list_str(self):
         return ",\n".join([rel.__str__() for rel in self.case.all().order_by("name")])
@@ -224,13 +223,3 @@ class tokenModel(publicModel):
     app_type = models.CharField(max_length=100, default=None, blank=True, null=True)
     token = models.JSONField(max_length=100, default=None, blank=True, null=True)
 
-
-class reportModel(publicModel):
-    plan = models.ForeignKey(planModel, verbose_name="源计划", blank=False, on_delete=models.DO_NOTHING)
-    pass_count = models.IntegerField(verbose_name="通过", blank=False, default=0, editable=False)
-    fail_count = models.IntegerField(verbose_name="失败", blank=False, default=0, editable=False)
-    error_count = models.IntegerField(verbose_name="异常", blank=False, default=0, editable=False)
-    pass_list = models.ManyToManyField(caseModel, verbose_name="通过列表", blank=True, editable=False,related_name="count")
-    fail_list = models.ManyToManyField(caseModel, verbose_name="失败列表", blank=True, editable=False,related_name="fail")
-    error_list = models.ManyToManyField(caseModel, verbose_name="异常列表", blank=True, editable=False,related_name="error")
-    msg = models.CharField(max_length=1000, default=None, blank=True, null=True)

@@ -16,6 +16,10 @@ planReplace = {
     planFiler.isUse: "是否可用",
     planFiler.createTime: "创建时间",
     planFiler.updateTime: "更新时间",
+    planFiler.msg: "执行日志",
+    planFiler.is_pass: "是否通过",
+
+
 
 }
 
@@ -25,6 +29,7 @@ caseReplace = {
     caseFiler.variable: "局部变量",
     caseFiler.stepList: "步骤列表",
     caseFiler.model: "所属模块",
+    caseFiler.plan: "所属计划",
 
     caseFiler.isUse: "是否可用",
     caseFiler.dataId: "编号"
@@ -56,6 +61,7 @@ requestInfoReplace = {
     requestInfoFiler.params: "默认参数",
     requestInfoFiler.headers: "headers",
     requestInfoFiler.doc_url: "文档地址",
+    requestInfoFiler.response: "请求结果",
     stepFiler.dataId: "编号"
 }
 
@@ -76,6 +82,7 @@ extractorReplace = {
     extractorFiler.value: "提取内容",
     extractorFiler.condition: "提取条件",
     extractorFiler.step: "所属步骤",
+    extractorFiler.result: "提取结果",
 
     extractorFiler.isUse: "是否可用",
     extractorFiler.dataId: "编号"
@@ -106,8 +113,8 @@ assertsReplace = {
 
 configReplace = {
 
-    configFiler.name: "配置参数名称",
-    configFiler.value: "配置值",
-    configFiler.isUse: "是否可用",
-    configFiler.dataId: "编号",
+    default.name: "配置参数名称",
+    default.value: "配置值",
+    default.isUse: "是否可用",
+    default.dataId: "编号",
 }

@@ -53,7 +53,7 @@ class planData(publicData):
     model_data: planModel
     filter = planFiler
 
-    def __init__(self, dataId):
+    def __init__(self, dataId=None):
         super().__init__(planModel, dataId)
 
     def get_data(self):
@@ -66,6 +66,7 @@ class planData(publicData):
             self.filter.name: model_data.name,
             self.filter.environment: self.get_default_data(),
             self.filter.globalVariable: self.get_variable_data(),
+            "selfModel":self
         }
 
     def get_case_data(self):
@@ -77,13 +78,13 @@ class planData(publicData):
 
     def get_variable_data(self):
         res_data_list = []
-        for data_model in self.model_data.variable.filter():
+        for data_model in self.model_data.variable_plan.filter():
             data_model: variableModel
             res_data_list.append(variableData().get_model(data_model).data_dict)
         return res_data_list
 
     def get_default_data(self):
-        return defaultData(self.model_data.environment_and_type.id).data_dict
+        return defaultData(self.model_data.default.id).data_dict
 
 # 用例
 class caseData(publicData):
@@ -104,7 +105,7 @@ class caseData(publicData):
             self.filer.variable: self.get_variable_data(),
             self.filer.stepList: self.get_step_data(),
             self.filer.assertList: self.get_asserts_data(),
-            # self.filer.caseNumber:the_model.caseNumber,
+            "selfModel":self
         }
 
     def get_variable_data(self):
@@ -117,14 +118,14 @@ class caseData(publicData):
     def get_asserts_data(self):
         res_data_list = []
         for data_model in self.model_data.assertsmodel_set.filter():
-            data_model: variableModel
+            data_model: assertsModel
             res_data_list.append(assertData().get_model(data_model).data_dict)
         return res_data_list
 
     def get_step_data(self):
         res_data_list = []
         for data_model in self.model_data.step.filter():
-            data_model: variableModel
+            data_model: stepModel
             res_data_list.append(stepData().get_model(data_model).data_dict)
         return res_data_list
 
@@ -155,6 +156,7 @@ class stepData(publicData):
             self.filer.calculator: self.get_calculator_data(),
             self.filer.extractor: self.get_extractor_data(),
             self.filer.case_variable: self.get_case_variable(),
+            "selfModel":self
         }
 
     def get_requestInfo_data(self):
@@ -178,7 +180,7 @@ class stepData(publicData):
     def get_calculator_data(self):
         res_data_list = []
         for data_model in self.model_data.calculatermodel_set.filter():
-            data_model: variableModel
+            data_model: calculaterModel
             res_data_list.append(calculaterData().get_model(data_model).data_dict)
         return res_data_list
 
@@ -198,7 +200,7 @@ class requestInfoData(publicData):
     model_data: requestInfoModel
     filer = requestInfoFiler
 
-    def __init__(self, dataId):
+    def __init__(self, dataId=None):
         super().__init__(requestInfoModel, dataId)
 
     def get_data(self):
@@ -214,7 +216,8 @@ class requestInfoData(publicData):
             self.filer.params: model_data.params,
             self.filer.method: model_data.method,
             self.filer.headers: model_data.headers,
-            self.filer.data: model_data.params
+            self.filer.data: model_data.params,
+            "selfModel":self
         }
 
 # 变量 -包括计划的变量和用例的变量
@@ -233,7 +236,8 @@ class variableData(publicData):
         return {
             self.filer.dataId: model_data.id,
             self.filer.name: model_data.name,
-            self.filer.value: model_data.value
+            self.filer.value: model_data.value,
+            "selfModel":self
         }
 
 # 提取器
@@ -254,6 +258,7 @@ class extractorData(publicData):
             self.filer.name: model_data.name,
             self.filer.value: model_data.value,
             self.filer.condition: model_data.condition,
+            "selfModel":self
         }
 
 # 计算器
@@ -275,6 +280,7 @@ class calculaterData(publicData):
             self.filer.Variable1: model_data.value1,
             self.filer.Variable2: model_data.value2,
             self.filer.calFunction: model_data.func,
+            "selfModel":self
         }
 
 # 验证器
@@ -294,15 +300,16 @@ class assertData(publicData):
             self.filer.dataId: model_data.id,
             self.filer.value1: model_data.name,
             self.filer.value2: model_data.name_another,
-            self.filer.assertMethod: model_data.func
+            self.filer.assertMethod: model_data.func,
+            "selfModel":self
         }
 
 # 默认数据
 class defaultData(publicData):
     model_data: defaultModel
-    filer = configFiler
+    filer = default
 
-    def __init__(self, dataId, ):
+    def __init__(self, dataId=None):
         super().__init__(defaultModel, dataId)
 
     def get_data(self):
@@ -314,6 +321,7 @@ class defaultData(publicData):
             self.filer.dataId: model_data.id,
             self.filer.name: model_data.name,
             self.filer.value: model_data.value,
+            "selfModel":self
         }
 
 # token表
@@ -337,9 +345,11 @@ class tokenData(publicData):
             "dataId": model_data.id,
             "uid": model_data.uid,
             "token": model_data.token,
+            "selfModel":self
         }
 
 
+
 if __name__ == '__main__':
-    res = caseData(dataId=2)
+    res = planData(dataId=1)
     print(json.dumps(res.data_dict, ensure_ascii=False))

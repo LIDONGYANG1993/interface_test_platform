@@ -143,14 +143,14 @@ class caseAdmin(publicAdmin):
 class planAdmin(publicAdmin):
     fieldsets_with_inlines = [
         (None, {'fields': ['name']}),
-        ('基本信息', {'fields': ["environment_and_type", "case"]}),
+        ('基本信息', {'fields': ["default", "case"]}),
         variableLine
     ]
 
     list_display = (
         "id", 'name', "case_list_str",
         "val_list_str", "create_user",
-        "update_user", "environment_and_type",
+        "update_user", "default",
         "created_time",
         "updated_time")
     autocomplete_fields = ["case", ]
@@ -210,9 +210,3 @@ class planAdmin(publicAdmin):
 #         (None, {'fields': ["token", "environment", "app_type"]})
 #     ]
 
-@admin.register(reportModel)
-class defaultAdmin(publicAdmin):
-    list_display = ["id", ]
-    ordering = []
-    list_display_links = ["id",]
-    fieldsets_with_inlines = []

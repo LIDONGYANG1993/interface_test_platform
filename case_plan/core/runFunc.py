@@ -5,8 +5,9 @@
 import json
 
 from config.casePlan.yamlFilersZh import *
-from case_plan.core.classes import *
-from case_plan.core.data import *
+from case_plan.core.exec_class import *
+from case_plan.core.read_class import *
+
 
 #  执行单接口
 def run_requestInfo(data_id):
@@ -17,12 +18,14 @@ def run_requestInfo(data_id):
     done.assert_wanba()
     return done.result_for_api()
 
+
 #  执行单个步骤
 def run_step(data_id):
     data = stepData(dataId=data_id)
     done = stepDone(data.data_dict)
     done.run_in_step()
     return done.result_for_api()
+
 
 #  执行单条用例
 def run_case(data_id):
@@ -39,6 +42,20 @@ def run_plan(data_id):
     return done.result_for_api()
 
 
+def run_plan_and_report(data_id):
+    from case_report.core.save_report import planReport
+    from case_report.core.read_report import planReportData
+    data = planData(dataId=data_id)
+    done = planDone(data.data_dict)
+    report = planReport()
+    done.run_in_plan()
+    report.get_data_by_data(data)
+    report.get_done_by_done(done)
+    report.create_report()
+    reportData = planReportData()
+    reportData.get_model(report.report)
+    return reportData.data_dict
+
+
 if __name__ == '__main__':
-    res = run_requestInfo(1)
-    print(json.dumps(res))
+    run_plan_and_report(1)

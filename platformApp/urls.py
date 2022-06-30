@@ -14,13 +14,14 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.template.defaulttags import url
-from django.urls import path, include
-from case_plan.urls import debug_url
+from django.urls import path
+from case_plan import urls as run_url
+from case_report import urls as report_url
 
 urlpatterns = [
     # path('grappelli/', include('grappelli.urls')),
     path('admin/', admin.site.urls),
-    path('run/', debug_url(), )
+    path('run/', run_url.debug_url(), ),
+    path('report/', report_url.debug_url(), ),
 
 ]

@@ -14,9 +14,8 @@ from config.casePlan.yamlFilersZh import *
 from case_plan.core.func import *
 from case_plan.models import publicModel
 from config.logger import Logger, project_path
-from case_plan.core.data import defaultData
+from case_plan.core.read_class import defaultData
 
-from case_plan.models import reportModel
 
 asserts_used = []
 
@@ -37,6 +36,14 @@ class publicDone:
         if key in self.keys:
             return self.data[key]
         return None
+
+    @property
+    def get_data_id(self):
+        return self._get_value("id")
+
+    @property
+    def get_data(self):
+        return self._get_value("selfModel")
 
     def _thread_add(self, func, params=None):
         if params is None: params = []
@@ -250,6 +257,8 @@ class assertsDone(publicDone):
         self.fail = None
         self.asserts_result_dict = {}
 
+        self.msg = ""
+
     def replace_in_asserts(self):
         self.step: stepDone
         self.case: caseDone
@@ -291,6 +300,10 @@ class assertsDone(publicDone):
         if is_number(self.value1) and is_number(self.value2):
             return str(self.value1) + str(self.assertMethod) + str(self.value2)
         return '"{}"'.format(str(self.value1)) + str(self.assertMethod) + '"{}"'.format(str(self.value2))
+
+    @property
+    def get_msg(self):
+        return self.get_asserts_str + ("失败！" if self.fail else "通过！")
 
     # 执行字符串代码，直接验算
     def asserts(self):
@@ -336,10 +349,10 @@ class requestDone(publicDone):
         self.host = self.get_host
         self.path = self.get_path
 
-        self.headers = self.get_headers
+        self.headers = self.get_headers.copy()
 
-        self.params = self.get_params
-        self.post_data = self.get_data
+        self.params = self.get_params.copy()
+        self.post_data = self.get_post_data.copy()
         self.method = self.get_method
         self.step = self.get_step
 
@@ -348,7 +361,8 @@ class requestDone(publicDone):
         self.response = None
         self.response_json = None
         self.error = None
-        self.code = 0
+        self.code = None
+        self.status = 10001  # 10001未执行, 10002执行失败, 10003执行异常, 0执行通过
 
 
     @property
@@ -360,7 +374,7 @@ class requestDone(publicDone):
         return self._get_value(requestInfoFiler.params)
 
     @property
-    def get_data(self):
+    def get_post_data(self):
         return self._get_value(requestInfoFiler.data)
 
     @property
@@ -394,7 +408,7 @@ class requestDone(publicDone):
         self.host = self.variable_replace(self.host, variable)
         self.path = self.variable_replace(self.path, variable)
         self.params = self.variable_replace(self.params, variable)
-        self.data = self.variable_replace(self.data, variable)
+        # self.data = self.variable_replace(self.data, variable)
         self.post_data = self.variable_replace(self.post_data, variable)
 
     # 访问请求
@@ -428,20 +442,24 @@ class requestDone(publicDone):
 
         if not self.response:  # 校验assert
             self.error = True
-            self.code = 99999
+            self.status = 10003  # 执行失败，没有返回值
             self.response_json = None
         elif self.response.status_code != 200:  # 校验code
             self.error = True
             self.code = self.response.status_code
+            self.status = 10004  # 执行失败，返回code不正常
             self.response_json = None
-        elif "__terror" in self.response.json():  # 校验code
+        elif "__terror" in self.response.json():  # 校验返回值
             self.error = True
-            self.code = 99998
+            self.status = 10005  # 执行失败，返回值不正确
             self.response_json = None
         else:
             self.error = False
-            self.code = self.response.status_code
-            self.response_json = self.response.json()
+            self.status = 10000  # 执行通过
+            try:
+                self.response_json = self.response.json()
+            except Exception:
+                self.status = 10006  # 执行失败，返回值不是json格式
 
     # 如果玩吧token失效，重新获取token，并重新执行request，仅校验一次
     def assert_wanba(self):
@@ -456,6 +474,7 @@ class requestDone(publicDone):
         self.result_massage()
         return {
             requestInfoFiler.name: self.name,
+            requestInfoFiler.dataId: self.get_data_id,
             requestInfoFiler.host: self.host,
             requestInfoFiler.path: self.path,
             requestInfoFiler.params: self.params,
@@ -468,9 +487,9 @@ class requestDone(publicDone):
     def result_massage(self):
         msg = []
         if self.error is None or self.error is True:
-            msg.append("接口：{},访问失败！\n".format(self.name))
+            msg.append("接口：{},访问失败！".format(self.name))
         else:
-            msg.append("接口：{},访问成功！\n".format(self.name))
+            msg.append("接口：{},访问成功！".format(self.name))
         self.msg = msg
 
     # 当独立运行requestInfo时，使用配置好的默认环境--此处原本设计为从数据库中读取，暂未实现
@@ -479,7 +498,7 @@ class requestDone(publicDone):
         if not self.step: return defaultParams
         if not self.step.case: return defaultParams
         if not self.step.case.plan: return defaultParams
-        return self.step.case.plan.environment
+        return self.step.case.plan.default.data
 
 
 #  变量Done类
@@ -519,7 +538,7 @@ class stepDone(publicDone):
         self.name = self.get_name
         self.case = self.get_case
         self.stepNumber = self.get_stepNumber
-        self.reParams = self.get_reParams
+        self.reParams = self.get_reParams.copy()
         self.requestInfo: requestDone = self.get_requestInfo
         self.asserts_list: [assertsDone] = self.get_asserts_list
         self.extractor_list: [extractorDone] = self.get_extractor_list
@@ -533,7 +552,7 @@ class stepDone(publicDone):
         self.error = None
         self.fail = None
         self.log = []
-        self.code = 0
+        self.status = 10001
 
     @property
     def get_name(self):
@@ -597,7 +616,7 @@ class stepDone(publicDone):
         self.requestInfo.assert_wanba()
         self.response = self.requestInfo.response
         self.error = self.requestInfo.error
-        self.code = self.requestInfo.code
+        self.status = self.requestInfo.status
 
     # 在步骤中，执行提取器
     def extractor_in_step(self):
@@ -667,6 +686,7 @@ class stepDone(publicDone):
         self.result_massage()
         return {
             stepFiler.name: self.name,
+            stepFiler.dataId: self.get_data_id,
             stepFiler.stepNumber: self.stepNumber,
             stepFiler.requestInfo: self.requestInfo.result_for_api(),
             stepFiler.extractor: self.extractor_result,
@@ -680,17 +700,17 @@ class stepDone(publicDone):
     def result_massage(self):
         msg = []
         if self.error:
-            msg.append("步骤：{},执行异常！\n".format(self.name))
+            msg.append("步骤：{},执行异常！".format(self.name))
         elif self.fail is None or self.fail is True:
-            msg.append("步骤：{},执行失败！\n".format(self.name))
+            msg.append("步骤：{},执行失败！".format(self.name))
         else:
-            msg.append("步骤：{},执行成功！\n".format(self.name))
+            msg.append("步骤：{},执行成功！".format(self.name))
         for asserts in self.asserts_list:
             if not asserts.asserts_result:
-                msg.append("验证：{},验证失败！\n".format(asserts.asserts_str))
+                msg.append("验证：{},验证失败！".format(asserts.asserts_str))
                 break
             else:
-                msg.append("验证：{}, 验证成功！\n".format(asserts.asserts_str))
+                msg.append("验证：{}, 验证成功！".format(asserts.asserts_str))
         self.msg = msg
 
 
@@ -710,6 +730,8 @@ class caseDone(publicDone):
         self.asserts_list = self.get_asserts_list
 
         self.fail = None
+
+        self.error = None
         self.asserts_result_for_api = []
 
         self.step_result_for_api = []
@@ -783,6 +805,10 @@ class caseDone(publicDone):
             self.extractor_result.update(step.extractor_result)
             self.calculater_result.update(step.calculator_result)
             self.step_result_for_api.append(step.result_for_api())
+            if not (step.error is False):
+                self.error = True
+            else:
+                self.error = False
             if not (step.error is False) or not (step.fail is False):  # 如果实行失败或者异常，标记用例失败
                 self.fail = True
             else:
@@ -804,9 +830,16 @@ class caseDone(publicDone):
         self.result_massage()
         return {
             caseFiler.name: self.name,
+            caseFiler.dataId: self.get_data_id,
             caseFiler.stepList: self.step_result_for_api,
             caseFiler.assertList: self.asserts_result_for_api,
             "msg": self.msg
+        }
+
+    def result_for_db(self):
+        return {
+            caseFiler.name: self.name,
+            caseFiler.dataId: self.data.get(caseFiler.dataId),
         }
 
     # 收集用例测msg信息
@@ -815,20 +848,36 @@ class caseDone(publicDone):
         for step in self.step_list:
             step: stepDone
             if not (step.error is False):
-                msg.append("步骤：{}-{},执行异常！\n".format(step.stepNumber, step.name))
+                msg.append("步骤：{}-{},执行异常！".format(step.stepNumber, step.name))
                 break
             elif not (step.fail is False):
-                msg.append("步骤：{}-{},执行失败！\n".format(step.stepNumber, step.name))
+                msg.append("步骤：{}-{},执行失败！".format(step.stepNumber, step.name))
                 break
             else:
-                msg.append("步骤：{}-{},执行成功！\n".format(step.stepNumber, step.name))
+                msg.append("步骤：{}-{},执行成功！".format(step.stepNumber, step.name))
         for asserts in self.asserts_list:
             if not (asserts.fail is False):
-                msg.append("验证：{},验证失败！\n".format(asserts.asserts_str))
+                msg.append("验证：{},验证失败！".format(asserts.asserts_str))
                 break
             else:
-                msg.append("验证：{}, 验证成功！\n".format(asserts.asserts_str))
+                msg.append("验证：{}, 验证成功！".format(asserts.asserts_str))
         self.msg = msg
+
+class defaultDone(publicDone):
+    def __init__(self, data):
+        super().__init__(data)
+        self.name = self.get_name
+        self.value = self.get_value
+
+    @property
+    def get_name(self):
+        return self._get_value(configReplace[default.name])
+
+    @property
+    def get_value(self):
+        return self._get_value(configReplace[default.value])
+
+
 
 
 # 计划Done类
@@ -837,12 +886,16 @@ class planDone(publicDone):
         super().__init__(data)
         self.name = self.get_name
         self.variable = self.get_variable
-        self.environment = self.get_environment
+        self.default = self.get_default
         self.extractor_result = {}
         self.calculater_result = {}
         self.replace_result = {}
         self.case_result_for_api = []
         self.case_list = self.get_case_list
+
+        self.error_list = []
+        self.pass_list = []
+        self.fail_list = []
 
         self.msg = None
 
@@ -856,8 +909,9 @@ class planDone(publicDone):
         return self._get_value(planFiler.name)
 
     @property
-    def get_environment(self):
-        return self._get_value(planFiler.environment)
+    def get_default(self):
+        parents = {default.plan: self}
+        return make_class(self._get_value(planFiler.environment), defaultDone, default.used, parents)
 
     @property
     def get_case_list(self):
@@ -875,7 +929,11 @@ class planDone(publicDone):
             self._thread_run_join(case.run_in_case)
             the_logger.debug("END-CASE: {} ".format(case.name, not case.fail))
             self.extractor_result.update(case.extractor_result)
+            result = case.result_for_db()
             self.case_result_for_api.append(case.result_for_api())
+            if case.error: self.error_list.append(result)
+            elif case.fail: self.fail_list.append(result)
+            else: self.pass_list.append(result)
         the_logger.debug("END-PLAN")
 
     # 收集替换参数
@@ -884,12 +942,23 @@ class planDone(publicDone):
             self.replace_result.update(var)
         self.replace_result.update(self.extractor_result)
 
+
+    def get_error_count(self):
+        return len(self.error_list)
+
+    def get_fail_count(self):
+        return len(self.fail_list)
+
+    def get_pass_count(self):
+        return len(self.pass_list)
+
     # 返回json格式的结果，服务与API
     def result_for_api(self):
         self.result_massage()
         return {
             planFiler.name: self.name,
-            planFiler.environment: self.environment,
+            planFiler.dataId: self.get_data_id,
+            planFiler.environment: self.default,
             planFiler.caseList: self.case_result_for_api,
             "msg": self.msg
 
@@ -901,9 +970,9 @@ class planDone(publicDone):
         for case in self.case_list:
             case: caseDone
             if not (case.fail is False):
-                msg.append("用例：{},执行失败！\n".format(case.name))
+                msg.append("用例：{},执行失败！".format(case.name))
             else:
-                msg.append("用例：{},执行成功！\n".format(case.name))
+                msg.append("用例：{},执行成功！".format(case.name))
         self.msg = msg
 
     def variable_dict(self):
@@ -917,22 +986,6 @@ class planDone(publicDone):
             )
         return res
 
-class reportDone:
-    def __init__(self, plan_id):
-        self.plan_id = plan_id
-        self.modelData = None
-
-
-    def new_report(self):
-        self.modelData = reportModel.objects.create(plan_id=self.plan_id)
-
-    def del_report(self):
-        self.modelData: reportModel.objects
-        self.modelData.delete()
-
-    def test_report(self):
-        self.modelData: reportModel.objects
-        self.modelData = None
 
 def responseDoneTest():
     res = extractorDone({extractorFiler.value: "a.b.0.e.0.z", "condition": '{"c":10},{"w": "12"}'})
@@ -971,14 +1024,14 @@ def calculaterDoneTest():
 
 
 def assertsDoneTest():
-    from case_plan.core.data import assertData
+    from case_plan.core.read_class import assertData
     asserts = assertsDone(assertData(1).data_dict)
     asserts.get_result()
     print(asserts.asserts_str)
 
 
 def planDoneTest():
-    from case_plan.core.data import planData
+    from case_plan.core.read_class import planData
     plan = planDone(planData(dataId=1).data_dict)
     plan.run_in_plan()
     print("END")
@@ -995,5 +1048,4 @@ def requestDoneTest():
 
 
 if __name__ == '__main__':
-    rep = reportDone(1)
-    pass
+    planDoneTest()

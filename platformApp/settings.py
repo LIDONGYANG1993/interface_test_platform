@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/4.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
-
+import os
 from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -23,18 +23,19 @@ SECRET_KEY = 'django-insecure-hbetbnyfrfe@*cyb^i5#m08sbpxcby6-_9b(c--3inju^neiu1
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["192.168.17.32", "0.0.0.0", "1.116.254.250", "101.200.239.26"]
+ALLOWED_HOSTS = ["192.168.17.32", "0.0.0.0", "1.116.254.250", "101.200.239.26", "localhost"]
 
 # Application definition
 
 INSTALLED_APPS = [
-    "simpleui",
+    # "simpleui",
     # "grappelli",
     "inline_actions",
     "import_export",
     "django_json_widget",
     "fieldsets_with_inlines",
     "case_plan.apps.CaseplanConfig",
+    "case_report.apps.CaseReportConfig",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -46,7 +47,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE_CLASSES = [
 ]
-
+SECURE_HSTS_INCLUDE_SUBDOMAINS = None
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -136,7 +137,9 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-
+STATICFILES_DIRS = (
+  "./static",
+)
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field

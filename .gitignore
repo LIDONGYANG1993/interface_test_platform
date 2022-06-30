@@ -8,6 +8,7 @@ dist
 build
 logs
 templates
-case_plan/migrations/
+*/migrations/
 .DS_Store
 /config/yapi_config.py
+/static/

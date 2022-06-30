@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>测试报告详情页</title>
+</head>
+<body>
+<h1 ><strong>报告详情页</strong></h1>
+<div>
+    <ol><strong>计划名称: </strong> {{ report.name }} </ol>
+    <ol><strong>计划编号: </strong> {{ report.from_data_id }} </ol>
+    <ol><strong>通过: </strong> {{ report.pass_count }} </ol>
+    <ol><strong>失败: </strong> {{ report.fail_count }} </ol>
+    <ol><strong>异常: </strong> {{ report.error_count }} </ol>
+
+</div>
+
+{% for case in report.caseList %}
+    <div>__________________________________________________________________________________</div>
+<div >
+    <div id="{{ case.from_data_id }}" class="case" style="margin-left: 20px">
+        <ul><strong>用例名称: </strong> {{ case.name }} </ul>
+        <ul><strong>用例编号: </strong> {{ case.from_data_id }} </ul>
+        <ul><strong>是否通过: </strong> {{ case.is_pass }} </ul>
+        <ul><strong>概览: </strong></ul>
+        <div style="margin-left: 20px">
+            {% for msg in case.msg %}
+                <ul> {{ msg }} </ul>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endfor %}
+</body>
+
+
+</html>

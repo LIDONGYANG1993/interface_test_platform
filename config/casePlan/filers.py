@@ -4,7 +4,6 @@
 # @Name  : 杨望宇
 
 
-
 class databaseYAPI:
     GROUP = 'yapi_group'
     PROJECT = 'yapi_project'
@@ -23,7 +22,6 @@ class databaseCase:
     interface_data_asserts = "interface_data_asserts"
     interface_data_configFilers = "interface_data_configFilers"
     interface_data_interface = "interface_data_interface"
-
 
     stepType = "stepType"
     valueType = "valueType"
@@ -64,11 +62,11 @@ class variableFiler:
     value = "value"  # 变量初始值
     plan = "plan"  # 所属计划
     case = "case"  # 所属用例
-
-
-    used = [name, value, plan, case]
-
     dataId = "id"
+
+    selfModel = "selfModel"
+    used = [selfModel, dataId, name, value, plan, case]
+
     isUse = "isUse"
 
 
@@ -79,11 +77,23 @@ class planFiler:
     globalVariable = "globalVariable"  # 全局变量 所有的变量，会在每次执行该计划时，初始化
     caseList = "caseList"  # 场景用例列表
 
+    error_count = "error_count"
+    pass_count = "pass_count"
+    fail_count = "fail_count"
 
     dataId = "id"
     isUse = "isUse"
     createTime = "createTime"
     updateTime = "updateTime"
+
+    is_pass = "is_pass"
+    msg = "msg"
+
+
+class public:
+    is_pass = "is_pass"
+    msg = "msg"
+    from_data_id = "from_data_id"
 
 
 class caseFiler:
@@ -96,9 +106,10 @@ class caseFiler:
     plan = "plan"
     assertList = "assertList"
 
-    used = [name, variable, stepList, plan, assertList]
-
     dataId = "id"
+    selfModel = "selfModel"
+    used = [selfModel, dataId, name, variable, stepList, plan, assertList]
+
     isUse = "isUse"
     createTime = "createTime"
     updateTime = "updateTime"
@@ -118,11 +129,12 @@ class stepFiler:
     assertList = "assertList"  # 验证器
     case_variable = "case_variable"  # 验证器
 
-    used = [name, stepNumber, requestInfo, reParams, extractor, calculator, assertList, case]
-
+    dataId = "id"
+    selfModel = "selfModel"
+    used = [selfModel, dataId, name, stepNumber, requestInfo, reParams, extractor, calculator, assertList, case]
 
     isUse = "isUse"
-    dataId = "id"
+    status = "status"
     createTime = "createTime"
     updateTime = "updateTime"
 
@@ -140,10 +152,14 @@ class requestInfoFiler:
     data = "data"
     result = "result"
 
+    response = "response"
+
+    status = "status"
+
     step = "step"
     dataId = "id"
-
-    used = [name, host, path, headers, method, params, data, step]
+    selfModel = "selfModel"
+    used = [selfModel, dataId, name, host, path, headers, method, params, data, step]
 
 
 class interfaceFiler:
@@ -158,24 +174,20 @@ class interfaceFiler:
     caseList = "caseList"  # 这个接口被哪些场景覆盖
     isUse = "isUse"
 
-
-
-
     dataId = "id"
     createTime = "createTime"
     updateTime = "updateTime"
 
 
-
-
 class extractorFiler:
     name = "name"  # 提取器存储名称，
     step = "step"  # 提取器存储名称，
-    value = "value"   # 提取路径参数，返回值是json格式的情况，采用A.b.c.0.d的方法，提取数值，
+    value = "value"  # 提取路径参数，返回值是json格式的情况，采用A.b.c.0.d的方法，提取数值，
     condition = "condition"
+    selfModel = "selfModel"
+    used = [selfModel, name, value, condition, step]
 
-    used = [name, value, condition, step]
-
+    result = "result"
     isUse = "isUse"
     dataId = "id"
 
@@ -186,8 +198,8 @@ class calculatorFiler:
     Variable2 = "Variable2"  # 变量2
     step = "step"
     calFunction = "calFunction"  # 计算方式，add , subtract , multiply  divide  对应，+ - * ÷
-
-    used = [name, Variable1, Variable2, calFunction, step]
+    selfModel = "selfModel"
+    used = [selfModel,  name, Variable1, Variable2, calFunction, step]
 
     result = "result"
 
@@ -196,14 +208,17 @@ class calculatorFiler:
     createTime = "createTime"
     updateTime = "updateTime"
 
-class configFiler:
+
+class default:
     name = "name"  # 提取器存储名称，
     value = "value"  # 变量1
+    plan = "plan"  # 关联计划
     isUse = "isUse"
     dataId = "id"
+    selfModel = "selfModel"
+    used = [selfModel, value, name, plan]
     createTime = "createTime"
     updateTime = "updateTime"
-
 
 
 class assertsFiler:
@@ -212,8 +227,8 @@ class assertsFiler:
     step = "step"
     case = "case"
     value2 = "value2"  # 验证变量名称2，可以引用全局变量，或者局部变量，也可以输入值；
-
-    used = [value1, assertMethod, value2, step, case]
+    selfModel = "selfModel"
+    used = [selfModel, value1, assertMethod, value2, step, case]
 
     result = "result"
     assertStr = "assertStr"
@@ -222,6 +237,3 @@ class assertsFiler:
     dataId = "id"
     createTime = "createTime"
     updateTime = "updateTime"
-
-
-

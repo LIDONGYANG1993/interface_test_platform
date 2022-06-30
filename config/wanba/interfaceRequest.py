@@ -10,7 +10,7 @@ from urllib import parse
 
 import requests
 
-from case_plan.core.data import tokenData
+from case_plan.core.read_class import tokenData
 from case_plan.models import tokenModel
 from config.wanba.privateServer import privateInterFace
 from config.wanba.yapi_login import yapi_login
