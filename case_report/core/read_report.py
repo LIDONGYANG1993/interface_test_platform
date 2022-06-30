@@ -82,13 +82,15 @@ class planReportData(publicReportData):
 
     def get_variable_data(self):
         res_data_list = []
-        for data_model in self.model_data.variable.filter():
+        for data_model in self.model_data.variable.all():
             data_model: variableModel
             res_data_list.append(variableReportData().get_model(data_model).data_dict)
         return res_data_list
 
     def get_default_data(self):
-        return defaultReportData(self.model_data.default.id).data_dict
+        defaultReport = defaultReportData()
+        defaultReport.get_model(self.model_data.default)
+        return defaultReport.data_dict
 
 # 用例
 class caseReportData(publicReportData):
@@ -101,8 +103,7 @@ class caseReportData(publicReportData):
     def get_data(self):
         model_data = self.model_data
         if not model_data: return None
-
-        the_logger.info("GET CASE-DATA")
+        the_logger.info("GET case-DATA")
         return {
             self.filer.dataId: model_data.id,
             self.filer.name: model_data.name,
@@ -151,7 +152,7 @@ class stepReportData(publicReportData):
         model_data = self.model_data
         if not model_data: return None
 
-        the_logger.debug("GET STEP-DATA")
+        the_logger.info("GET step-DATA")
         return {
             self.filer.dataId: model_data.id,
             self.filer.name: model_data.name,
@@ -170,7 +171,9 @@ class stepReportData(publicReportData):
 
     def get_requestInfo_data(self):
         variable: variableModel
-        return requestInfoReportData(dataId=self.model_data.requestInfo.id).data_dict
+        requestInfo = requestInfoReportData()
+        requestInfo.get_model(self.model_data.requestInfo)
+        return requestInfo.data_dict
 
     def get_asserts_data(self):
         res_data_list = []
@@ -216,7 +219,7 @@ class requestInfoReportData(publicReportData):
     def get_data(self):
         model_data = self.model_data
         if not model_data: return None
-
+        the_logger.info("GET requestInfo-DATA")
         return {
             self.filer.dataId: model_data.id,
             self.filer.name: model_data.name,
@@ -242,7 +245,7 @@ class variableReportData(publicReportData):
     def get_data(self):
         model_data = self.model_data
         if not model_data: return None
-
+        the_logger.info("GET variable-DATA")
         return {
             self.filer.dataId: model_data.id,
             self.filer.name: model_data.name,
@@ -282,8 +285,7 @@ class calculaterReportData(publicReportData):
     def get_data(self):
         model_data = self.model_data
         if not model_data: return None
-
-        the_logger.debug("GET CALC-DATA")
+        the_logger.info("GET calculater-DATA")
         return {
             self.filer.dataId: model_data.id,
             self.filer.name: model_data.name,
@@ -299,6 +301,7 @@ class calculaterReportData(publicReportData):
 class assertReportData(publicReportData):
     model_data: assertsReportModel
     filer = assertsFiler
+    the_logger.info("GET assert-DATA")
 
     def __init__(self, dataId=None):
         super().__init__(assertsReportModel, dataId)
@@ -328,7 +331,7 @@ class defaultReportData(publicReportData):
     def get_data(self):
         model_data = self.model_data
         if not model_data: return None
-
+        the_logger.info("default-DATA")
         return {
             self.filer.dataId: model_data.id,
             self.filer.name: model_data.name,
