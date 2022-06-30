@@ -643,6 +643,9 @@ class stepDone(publicDone):
 
     # 在步骤中执行验证器
     def asserts_in_step(self):
+        if len(self.asserts_list) == 0:
+            self.fail = False
+            return
         for asserts in self.asserts_list:
             if self.fail: return   # 当验证已经失败时，停止继续验证
             asserts: assertsDone

@@ -56,6 +56,7 @@ class publicReport:
         for msg in msg_list:
             if msg is msg_list[-1]:
                 res_msg = res_msg + msg
+                break
             res_msg = res_msg + msg + "\n"
         return res_msg
 
@@ -91,9 +92,11 @@ class planReport(publicReport):
 
     def make_result(self):
         self.done: planDone
+        self.done.result_massage()
         self.report.pass_count = self.done.get_pass_count()
         self.report.fail_count = self.done.get_fail_count()
         self.report.error_count = self.done.get_error_count()
+        self.report.msg = self.make_msg(self.done.msg)
 
     def make_case(self):
 

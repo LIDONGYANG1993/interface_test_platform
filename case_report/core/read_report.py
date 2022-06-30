@@ -69,6 +69,7 @@ class planReportData(publicReportData):
             self.filter.pass_count: model_data.pass_count,
             self.filter.fail_count: model_data.fail_count,
             self.filter.error_count: model_data.error_count,
+            self.filter.msg: model_data.msg,
             public.from_data_id: model_data.from_data.id,
         }
 

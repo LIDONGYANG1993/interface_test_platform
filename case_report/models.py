@@ -34,7 +34,7 @@ class stepReportModel(publicReportModel):
     from_data = models.ForeignKey(stepModel, verbose_name="源步骤", default=None, blank=True, on_delete=models.SET_NULL, null=True)
     name = models.CharField(stepReplace[stepFiler.name], max_length=100, default=None, blank=True)
     requestInfo = models.OneToOneField("requestInfoReportModel", verbose_name=stepReplace[stepFiler.requestInfo], unique=False,on_delete=models.CASCADE)
-    params = models.JSONField(stepReplace[stepFiler.reParams], max_length=100, default=dict, blank=True)
+    params = models.JSONField(stepReplace[stepFiler.reParams], default=dict, blank=True)
     stepNumber = models.IntegerField(stepReplace[stepFiler.stepNumber], default=1, auto_created=True)
     case = models.ForeignKey("caseReportModel", verbose_name=stepReplace[stepFiler.case], related_name="step", default=None,blank=True, on_delete=models.CASCADE, null=True)
     status = models.IntegerField(default=0, blank=True, null=True)
@@ -46,15 +46,15 @@ class requestInfoReportModel(publicReportModel):
     host = models.URLField(requestInfoReplace[requestInfoFiler.host], max_length=200, default="", blank=True)
     path = models.CharField(requestInfoReplace[requestInfoFiler.path], max_length=200, default="", blank=True)
     method = models.CharField(requestInfoReplace[requestInfoFiler.method], max_length=5, choices=publicModel.methodTypeChoices.choices, default=publicModel.methodTypeChoices.POST)  # 步骤方法,应隶属步骤类型
-    headers = models.JSONField(requestInfoReplace[requestInfoFiler.headers], max_length=255, default=dict, blank=True)
-    params = models.JSONField(requestInfoReplace[requestInfoFiler.params], max_length=255, default=dict, blank=True)
-    response = models.TextField(requestInfoReplace[requestInfoFiler.response], max_length=255, default=dict, blank=True, null=True)
+    headers = models.JSONField(requestInfoReplace[requestInfoFiler.headers], default=dict, blank=True)
+    params = models.JSONField(requestInfoReplace[requestInfoFiler.params], default=dict, blank=True)
+    response = models.JSONField(requestInfoReplace[requestInfoFiler.response], default=dict, blank=True, null=True)
     status = models.IntegerField(default=0, blank=True, null=True)
 
 class defaultReportModel(publicModel):
     from_data = models.ForeignKey(defaultModel, verbose_name="源环境信息", default=None, blank=True, on_delete=models.SET_NULL, null=True)
     name = models.CharField(configReplace[default.name], max_length=100, default="environment", blank=True)
-    value = models.JSONField(configReplace[default.value], max_length=500, default=dict, blank=True)
+    value = models.JSONField(configReplace[default.value], default=dict, blank=True)
 
     def __str__(self):
         return "{}".format(self.name)
@@ -77,14 +77,14 @@ class extractorReportModel(publicModel):
     from_data = models.ForeignKey(extractorModel, verbose_name="源提取器", default=None, blank=True, on_delete=models.SET_NULL, null=True)
     step = models.ForeignKey("stepReportModel", verbose_name=extractorReplace[extractorFiler.step], unique=False,
                              on_delete=models.SET_NULL, blank=True, editable=False, null=True)
-    name = models.CharField(extractorReplace[extractorFiler.name], max_length=100, default="CODE", blank=True)
-    value = models.CharField(extractorReplace[extractorFiler.value], max_length=100, default="code", blank=True)
-    condition = models.CharField(extractorReplace[extractorFiler.condition], max_length=100, default="", blank=True)
-    result = models.CharField( max_length=100, default="", blank=True)
+    name = models.CharField(extractorReplace[extractorFiler.name], max_length=20, default="CODE", blank=True)
+    value = models.CharField(extractorReplace[extractorFiler.value], max_length=255, default="code", blank=True)
+    condition = models.CharField(extractorReplace[extractorFiler.condition], max_length=50, default="", blank=True)
+    result = models.CharField(max_length=255, default="", blank=True)
 
 class assertsReportModel(publicReportModel):
     from_data = models.ForeignKey(assertsModel, verbose_name="源验证器", default=None, blank=True, on_delete=models.SET_NULL, null=True)
-    name = models.CharField(assertsReplace[assertsFiler.value1], max_length=100, default="{{CODE}}", blank=True)
+    name = models.CharField(assertsReplace[assertsFiler.value1], max_length=20, default="{{CODE}}", blank=True)
 
     step = models.ForeignKey("stepReportModel", verbose_name=extractorReplace[extractorFiler.step], unique=False,
                              on_delete=models.CASCADE, blank=True, editable=False, null=True)
@@ -92,7 +92,7 @@ class assertsReportModel(publicReportModel):
                              on_delete=models.CASCADE, blank=True, editable=False, null=True)
     func = models.CharField(assertsReplace[assertsFiler.assertMethod], max_length=5,
                             default=publicModel.funcChoices.EQL, choices=publicModel.funcChoices.choices, blank=True)
-    name_another = models.CharField(assertsReplace[assertsFiler.value2], max_length=100, default=0, blank=True)
+    name_another = models.CharField(assertsReplace[assertsFiler.value2], max_length=20, default=0, blank=True)
     result = models.CharField(max_length=100, default="", blank=True)
 
     def __str__(self):
@@ -102,11 +102,11 @@ class assertsReportModel(publicReportModel):
 
 class calculaterReportModel(publicModel):
     from_data = models.ForeignKey(calculaterModel, verbose_name="源计算器", default=None, blank=True, on_delete=models.SET_NULL, null=True)
-    name = models.CharField(calculatorReplace[calculatorFiler.name], max_length=100, default="variable0", blank=True)
+    name = models.CharField(calculatorReplace[calculatorFiler.name], max_length=20, default="variable0", blank=True)
     step = models.ForeignKey("stepReportModel", verbose_name=calculatorReplace[calculatorFiler.step], unique=False,on_delete=models.CASCADE, blank=True, null=True)
-    value1 = models.CharField(calculatorReplace[calculatorFiler.Variable1], max_length=100, default="{{variable1}}",blank=True)
+    value1 = models.CharField(calculatorReplace[calculatorFiler.Variable1], max_length=20, default="{{variable1}}",blank=True)
     func = models.CharField(calculatorReplace[calculatorFiler.calFunction], max_length=10,default=publicModel.calChoices.ADD, choices=publicModel.calChoices.choices, blank=True)
-    value2 = models.CharField(calculatorReplace[calculatorFiler.Variable2], max_length=100, default=100, blank=True)
+    value2 = models.CharField(calculatorReplace[calculatorFiler.Variable2], max_length=20, default=100, blank=True)
     result = models.CharField(max_length=100,default="", blank=True)
 
 

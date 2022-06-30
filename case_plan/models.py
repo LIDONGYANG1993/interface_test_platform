@@ -65,6 +65,17 @@ class defaultModel(publicModel):
     def __str__(self):
         return "{}".format(self.name)
 
+class dingModel(publicModel):
+    name = models.CharField(max_length=100, default=None, blank=False)  # 机器人名称
+    ding_url = models.CharField(max_length=500, default=None, blank=False)  # 机器人地址
+    group = models.CharField(max_length=500, default=None, blank=True)  # 机器人地址
+
+    def __str__(self):
+        return "{}-{}".format(self.name, self.group)
+
+    class Meta:
+        verbose_name = "机器人"
+        verbose_name_plural = "005-机器人"
 
 class variableModel(publicModel):
     name = models.CharField(variableReplace[variableFiler.name], max_length=500, default=None, blank=False)  # 变量名称
@@ -73,6 +84,7 @@ class variableModel(publicModel):
     case = models.ForeignKey("caseModel", verbose_name=variableReplace[variableFiler.case], on_delete=models.CASCADE,
                              default=None, blank=True, null=True, editable=False, related_name="variable_case")
     value = models.CharField(variableReplace[variableFiler.value], max_length=500, default="", blank=False)  # 变量初始值
+
 
     class Meta:
         verbose_name = "计划变量"
@@ -199,6 +211,7 @@ class planModel(publicModel):
     name = models.CharField(planReplace[planFiler.name], max_length=500, default=None, blank=False)
     default = models.ForeignKey("defaultModel", on_delete=models.SET_NULL, null=True, verbose_name=planReplace[planFiler.environment], max_length=5, default=1)
     case = models.ManyToManyField(caseModel, verbose_name=planReplace[planFiler.caseList], default=None, blank=True)
+    ding = models.ForeignKey(dingModel, verbose_name="钉钉机器人", default=None, blank=True, on_delete=models.SET_NULL, null=True)
 
     class Meta:
         verbose_name = "测试计划"

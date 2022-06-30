@@ -139,11 +139,19 @@ class caseAdmin(publicAdmin):
     search_fields = ["name", "id", "model"]
 
 
+@admin.register(dingModel)
+class dingAdmin(publicAdmin):
+    fieldsets_with_inlines = [
+        (None, {'fields': ['name']}),
+        ('基本信息', {'fields': ["ding_url","group"]})
+    ]
+
 @admin.register(planModel)
 class planAdmin(publicAdmin):
     fieldsets_with_inlines = [
         (None, {'fields': ['name']}),
         ('基本信息', {'fields': ["default", "case"]}),
+        ('机器人', {'fields': ["ding"]}),
         variableLine
     ]
 
@@ -153,7 +161,7 @@ class planAdmin(publicAdmin):
         "update_user", "default",
         "created_time",
         "updated_time")
-    autocomplete_fields = ["case", ]
+    autocomplete_fields = ["case", "ding"]
 
 
 # @admin.register(assertsModel)
