@@ -294,8 +294,6 @@ class assertData(publicData):
     def get_data(self):
         model_data = self.model_data
         if not model_data: return None
-
-        the_logger.debug("GET ASSERT-DATA")
         return {
             self.filer.dataId: model_data.id,
             self.filer.value1: model_data.name,

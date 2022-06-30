@@ -301,7 +301,6 @@ class calculaterReportData(publicReportData):
 class assertReportData(publicReportData):
     model_data: assertsReportModel
     filer = assertsFiler
-    the_logger.info("GET assert-DATA")
 
     def __init__(self, dataId=None):
         super().__init__(assertsReportModel, dataId)
