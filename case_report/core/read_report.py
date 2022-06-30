@@ -82,7 +82,7 @@ class planReportData(publicReportData):
 
     def get_variable_data(self):
         res_data_list = []
-        for data_model in self.model_data.variable.all():
+        for data_model in self.model_data.variable.filter():
             data_model: variableModel
             res_data_list.append(variableReportData().get_model(data_model).data_dict)
         return res_data_list
