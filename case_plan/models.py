@@ -2,6 +2,9 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from config.casePlan.yamlFilersZh import *
 from case_plan.manager import PropertyManager
+from django.core.validators import MaxValueValidator as MAX
+from django.core.validators import MinValueValidator as MIN
+
 
 # Create your models here
 
@@ -21,6 +24,12 @@ class publicModel(models.Model):
         STR = 'STR', _('字符串')
         INT = 'INT', _('数字')
         FLOAT = "FLT", _('浮点')
+
+    # 类型选择器
+    class repeatTypeChoices(models.TextChoices):
+        DAY = 'day', _('每天')
+        WEEKS = 'weeks', _('每周')
+        MOON = "moon", _('每月')
 
     # 计算选择器
     class calChoices(models.TextChoices):
@@ -65,6 +74,7 @@ class defaultModel(publicModel):
     def __str__(self):
         return "{}".format(self.name)
 
+
 class dingModel(publicModel):
     name = models.CharField(max_length=100, default=None, blank=False)  # 机器人名称
     ding_url = models.CharField(max_length=500, default=None, blank=False)  # 机器人地址
@@ -77,6 +87,7 @@ class dingModel(publicModel):
         verbose_name = "机器人"
         verbose_name_plural = "005-机器人"
 
+
 class variableModel(publicModel):
     name = models.CharField(variableReplace[variableFiler.name], max_length=500, default=None, blank=False)  # 变量名称
     plan = models.ForeignKey("planModel", verbose_name=variableReplace[variableFiler.plan], on_delete=models.CASCADE,
@@ -85,13 +96,34 @@ class variableModel(publicModel):
                              default=None, blank=True, null=True, editable=False, related_name="variable_case")
     value = models.CharField(variableReplace[variableFiler.value], max_length=500, default="", blank=False)  # 变量初始值
 
-
     class Meta:
         verbose_name = "计划变量"
         verbose_name_plural = "计划变量"
 
     def __str__(self):
         return "{}：{}".format(self.name, self.value)
+
+
+class taskModel(publicModel):
+    name = models.CharField(max_length=20, default="任务名称", blank=False)
+    repeat = models.BooleanField(verbose_name="是否期望重复", default=False, blank=False)
+    repeat_type = models.TextField(verbose_name="重复类型", default=publicModel.repeatTypeChoices.DAY,choices=publicModel.repeatTypeChoices.choices, blank=True)
+    repeat_moon = models.IntegerField(verbose_name="期望每月 N日？",default=0,validators=[MAX(31), MIN(0)], blank=True)
+    repeat_week = models.IntegerField(verbose_name="期望每周 周N？",default=0, validators=[MAX(7), MIN(0)], blank=True)
+    expectation_data = models.DateField(verbose_name="期望执行日期", blank=True)
+    expectation_time = models.TimeField(verbose_name="期望执行时间", blank=True)
+    plan = models.ForeignKey("planModel", on_delete=models.CASCADE, blank=False)
+    is_used = models.BooleanField(verbose_name="是否启用", default=True, blank=False)
+    is_ding = models.BooleanField(verbose_name="是否钉钉推送", default=True, blank=False)
+    self_set = models.TextField(verbose_name="自定义【高级用法】", blank=True,default=None, null=True)
+
+    class Meta:
+        verbose_name = "定时任务"
+        verbose_name_plural = "006-定时任务"
+
+
+    def __str__(self):
+        return "{}：{}".format(self.name, self.plan.name)
 
 
 class extractorModel(publicModel):
@@ -172,7 +204,8 @@ class stepModel(publicModel):
                                     on_delete=models.CASCADE)
     params = models.JSONField(stepReplace[stepFiler.reParams], max_length=500, default=dict, blank=True)
     stepNumber = models.IntegerField(stepReplace[stepFiler.stepNumber], default=1, auto_created=True)
-    case = models.ForeignKey("caseModel", verbose_name=stepReplace[stepFiler.case], related_name="step", default=None,blank=False, on_delete=models.CASCADE, null=True)
+    case = models.ForeignKey("caseModel", verbose_name=stepReplace[stepFiler.case], related_name="step", default=None,
+                             blank=False, on_delete=models.CASCADE, null=True)
 
     class Meta:
         verbose_name = "测试步骤"
@@ -209,9 +242,10 @@ class caseModel(publicModel):
 
 class planModel(publicModel):
     name = models.CharField(planReplace[planFiler.name], max_length=500, default=None, blank=False)
-    default = models.ForeignKey("defaultModel", on_delete=models.SET_NULL, null=True, verbose_name=planReplace[planFiler.environment], max_length=5, default=1)
+    default = models.ForeignKey("defaultModel", on_delete=models.SET_NULL, null=True,
+                                verbose_name=planReplace[planFiler.environment], max_length=5, default=1)
     case = models.ManyToManyField(caseModel, verbose_name=planReplace[planFiler.caseList], default=None, blank=True)
-    ding = models.ForeignKey(dingModel, verbose_name="钉钉机器人", default=None, blank=True, on_delete=models.SET_NULL, null=True)
+    ding = models.ForeignKey(dingModel, verbose_name="钉钉机器人", default=None, blank=True, on_delete=models.SET_NULL,null=True)
 
     class Meta:
         verbose_name = "测试计划"
@@ -235,4 +269,3 @@ class tokenModel(publicModel):
     environment = models.CharField(max_length=100, default=None, blank=True, null=True)
     app_type = models.CharField(max_length=100, default=None, blank=True, null=True)
     token = models.JSONField(max_length=100, default=None, blank=True, null=True)
-

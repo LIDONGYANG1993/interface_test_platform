@@ -67,5 +67,10 @@ def update_interface_by_cat(request):
         result.update({"data":res_get[1]})
     else:
         return JsonResponse(response.cat_id_error)
+    return JsonResponse(result)
 
+
+def update_job(request):
+    result = response.result
+    add_job()
     return JsonResponse(result)

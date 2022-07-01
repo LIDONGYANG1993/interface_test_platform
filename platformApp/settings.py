@@ -9,8 +9,8 @@ https://docs.djangoproject.com/en/4.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
-import os
 from pathlib import Path
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -30,6 +30,7 @@ ALLOWED_HOSTS = ["192.168.17.32", "0.0.0.0", "1.116.254.250", "101.200.239.26", 
 INSTALLED_APPS = [
     # "simpleui",
     # "grappelli",
+    "django_crontab",
     "inline_actions",
     "import_export",
     "django_json_widget",
@@ -145,3 +146,14 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CRONTAB_COMMAND_SUFFIX = "2>&1"
+
+
+def _():
+    from case_plan.core.tasks import get_tasks
+    r = get_tasks()
+    return r
+
+
+CRONJOBS = _()

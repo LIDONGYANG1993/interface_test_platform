@@ -218,3 +218,20 @@ class planAdmin(publicAdmin):
 #         (None, {'fields': ["token", "environment", "app_type"]})
 #     ]
 
+
+@admin.register(taskModel)
+class taskAdmin(publicAdmin):
+    change_list_template = "admin/change_list_task.html"
+    fieldsets_with_inlines = [
+        (None, {'fields': ['name']}),
+        (None, {'fields': ['plan']}),
+        (None, {'fields': ['is_ding']}),
+        (None, {'fields': ['is_used']}),
+        ("自定义期望：【与简要期望二选一】", {'fields': ["self_set"],"classes": ["collapse", ]}),
+        ("简要期望：", {'fields': ["repeat", "repeat_type"]}),
+        ("周-期望【1-7】：", {'fields': ["repeat_week"], "classes": ["collapse", ]}),
+        ("月-期望【1-31】：", {'fields': ["repeat_moon"],"classes": ["collapse", ]}),
+        ("不期望重复时，选填", {'fields': ["expectation_data"],"classes": ["collapse", ]}),
+        ("默认早八点半", {'fields': ["expectation_time"]}),
+    ]
+

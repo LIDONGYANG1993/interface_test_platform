@@ -2,11 +2,15 @@
 # -*- coding: utf-8 -*-
 # @Date  : 2022/05/25
 # @Name  : 杨望宇
-import json
+
 
 from config.casePlan.yamlFilersZh import *
+import os
 from case_plan.core.exec_class import *
 from case_plan.core.read_class import *
+from case_plan.core.tasks import BASE_DIR
+
+
 
 
 #  执行单接口
@@ -56,6 +60,9 @@ def run_plan_and_report(data_id):
     reportData.get_model(report.report)
     return reportData
 
+def add_job():
+    os.popen("/bin/sh {}/add_job.sh".format(BASE_DIR))
+
 
 if __name__ == '__main__':
-    run_plan_and_report(1)
+    add_job()

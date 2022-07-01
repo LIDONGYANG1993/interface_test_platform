@@ -1,0 +1,13 @@
+{% extends 'admin/change_list.html' %}
+{% block object-tools %}
+  <div>
+    <form action="../../../run/updatejob" method="GET" target="_blank">
+        <label>
+            {% csrf_token %}
+        </label>
+        <button type="submit">刷新定时任务</button>
+    </form>
+  </div>
+  <br />
+  {{ block.super }}
+{% endblock %}
