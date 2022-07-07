@@ -151,8 +151,10 @@ CRONTAB_COMMAND_SUFFIX = "2>&1"
 
 
 def _():
-    from case_plan.core.tasks import get_tasks
-    r = get_tasks()
+    from case_plan.jobs.read_task import read_task
+    # from case_plan.core.tasks import get_tasks
+    path = BASE_DIR
+    r = read_task(path)
     return r
 
 

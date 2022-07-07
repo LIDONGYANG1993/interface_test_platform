@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.db.models import JSONField,URLField
+from django.db.models import JSONField, URLField
 from django_json_widget.widgets import JSONEditorWidget
 from django.contrib.admin.widgets import AdminURLFieldWidget
 from fieldsets_with_inlines import FieldsetsInlineMixin
@@ -9,6 +9,7 @@ from .models import *
 from inline_actions.admin import InlineActionsMixin
 from inline_actions.admin import InlineActionsModelAdminMixin
 from inline_actions.actions import DefaultActionsMixin
+
 # Register your models here.
 
 # 配置标题
@@ -34,7 +35,7 @@ class publicAdmin(FieldsetsInlineMixin, InlineActionsModelAdminMixin, ImportExpo
         JSONField: {'widget': JSONEditorWidget(height="350px")},
     }
 
-    def save_model(self, request, obj: stepModel, form, change):  # 自动保存修改和创建人
+    def save_model(self, request, obj, form, change):  # 自动保存修改和创建人
         if not change:
             obj.create_user = request.user.username
         obj.update_user = request.user.username
@@ -91,7 +92,7 @@ class stepLine(InlineActionsMixin, DefaultActionsMixin, publicLine):
     model = stepModel
     exclude = ["params", ]
     sortable_field_name = "stepNumber"
-    autocomplete_fields = ["requestInfo",]
+    autocomplete_fields = ["requestInfo", ]
 
 
 @admin.register(requestInfoModel)
@@ -100,7 +101,7 @@ class requestInfoAdmin(publicAdmin):
     list_display = ("id", 'name', 'path', 'params', "doc_url",)
     fieldsets_with_inlines = [
         (None, {'fields': ['name']}),
-        ('基本信息', {'fields': ["doc_url","host", "path"]}),
+        ('基本信息', {'fields': ["doc_url", "host", "path"]}),
         ("参数集", {"fields": ["params"]}),
     ]
     search_fields = ["name", "id", "path"]
@@ -143,8 +144,9 @@ class caseAdmin(publicAdmin):
 class dingAdmin(publicAdmin):
     fieldsets_with_inlines = [
         (None, {'fields': ['name']}),
-        ('基本信息', {'fields': ["ding_url","group"]})
+        ('基本信息', {'fields': ["ding_url", "group"]})
     ]
+
 
 @admin.register(planModel)
 class planAdmin(publicAdmin):
@@ -225,13 +227,24 @@ class taskAdmin(publicAdmin):
     fieldsets_with_inlines = [
         (None, {'fields': ['name']}),
         (None, {'fields': ['plan']}),
-        (None, {'fields': ['is_ding']}),
-        (None, {'fields': ['is_used']}),
-        ("自定义期望：【与简要期望二选一】", {'fields': ["self_set"],"classes": ["collapse", ]}),
-        ("简要期望：", {'fields': ["repeat", "repeat_type"]}),
-        ("周-期望【1-7】：", {'fields': ["repeat_week"], "classes": ["collapse", ]}),
-        ("月-期望【1-31】：", {'fields': ["repeat_moon"],"classes": ["collapse", ]}),
-        ("不期望重复时，选填", {'fields': ["expectation_data"],"classes": ["collapse", ]}),
-        ("默认早八点半", {'fields': ["expectation_time"]}),
+        (None, {'fields': [('is_ding', 'is_used')]}),
+        ("执行时间：", {'fields': ["expectation_time"]}),
+        ("运行周期：", {'fields': [("is_not_repeat", "expectation_data"), ]}),
+        ("每天", {'fields': ["is_evey_day"]}),
+        ("每周", {'fields': ["is_evey_week", "repeat_week"]}),
+        ("每月", {'fields': ["is_evey_moon", "repeat_moon"]}),
+
+        ("运行周期-自定义", {'fields': ["self_set"], "classes": ["collapse", ]}),
     ]
 
+    def save_model(self, request, obj: taskModel, form, change):
+        obj.repeat = not obj.is_not_repeat
+        if obj.is_evey_day:
+            obj.repeat_type = obj.repeatTypeChoices.DAY
+        elif obj.is_evey_week:
+            obj.repeat_type = obj.repeatTypeChoices.WEEKS
+        elif obj.is_evey_moon:
+            obj.repeat_type = obj.repeatTypeChoices.MOON
+        else:
+            obj.repeat = False
+        super().save_model(request, obj, form, change)

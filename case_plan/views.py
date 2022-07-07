@@ -1,3 +1,5 @@
+import time
+
 from django.shortcuts import render
 
 # Create your views here.
@@ -6,6 +8,7 @@ from case_plan.core.runFunc import *
 from config.casePlan import response
 from django.http import HttpResponse
 from django.http import JsonResponse
+from case_plan.core.tasks import save_task
 from config.wanba.reptileYapi.get_yapi_insert_interface import Interface
 
 def run_case_by_id(request):
@@ -78,5 +81,9 @@ def update_interface_by_cat(request):
 def update_job(request):
     resp = response()
     result = resp.result
-    add_job()
+    save_task()
+    try:
+        add_job()
+    except Exception:
+        pass
     return JsonResponse(result)

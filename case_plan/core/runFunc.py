@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # @Date  : 2022/05/25
 # @Name  : 杨望宇
-
+import subprocess
 
 from config.casePlan.yamlFilersZh import *
 import os
@@ -61,7 +61,8 @@ def run_plan_and_report(data_id):
     return reportData
 
 def add_job():
-    os.popen("/bin/sh {}/add_job.sh".format(BASE_DIR))
+    subprocess.Popen("/bin/sh {}/add_job.sh".format(BASE_DIR))
+
 
 
 if __name__ == '__main__':

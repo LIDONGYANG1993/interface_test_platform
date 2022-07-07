@@ -108,18 +108,26 @@ class taskModel(publicModel):
     name = models.CharField(max_length=20, default="任务名称", blank=False)
     repeat = models.BooleanField(verbose_name="是否期望重复", default=False, blank=False)
     repeat_type = models.TextField(verbose_name="重复类型", default=publicModel.repeatTypeChoices.DAY,choices=publicModel.repeatTypeChoices.choices, blank=True)
-    repeat_moon = models.IntegerField(verbose_name="期望每月 N日？",default=0,validators=[MAX(31), MIN(0)], blank=True)
-    repeat_week = models.IntegerField(verbose_name="期望每周 周N？",default=0, validators=[MAX(7), MIN(0)], blank=True)
-    expectation_data = models.DateField(verbose_name="期望执行日期", blank=True)
-    expectation_time = models.TimeField(verbose_name="期望执行时间", blank=True)
+    repeat_moon = models.IntegerField(verbose_name="几号？",default=0,validators=[MAX(31), MIN(0)], blank=True)
+    repeat_week = models.IntegerField(verbose_name="周几？",default=0, validators=[MAX(7), MIN(0)], blank=True)
+    expectation_data = models.DateField(verbose_name="选择执行日期", blank=True)
+    expectation_time = models.TimeField(verbose_name="选择执行时间", blank=True)
     plan = models.ForeignKey("planModel", on_delete=models.CASCADE, blank=False)
-    is_used = models.BooleanField(verbose_name="是否启用", default=True, blank=False)
+    is_used = models.BooleanField(verbose_name="是否启用该任务", default=True, blank=False)
     is_ding = models.BooleanField(verbose_name="是否钉钉推送", default=True, blank=False)
     self_set = models.TextField(verbose_name="自定义【高级用法】", blank=True,default=None, null=True)
+
+    is_not_repeat = models.BooleanField(verbose_name="不重复？", default=True, blank=False)
+
+    is_evey_day = models.BooleanField(verbose_name="每天？", default=False, blank=False)
+    is_evey_week = models.BooleanField(verbose_name="每周？", default=False, blank=False)
+    is_evey_moon = models.BooleanField(verbose_name="每月？", default=False, blank=False)
 
     class Meta:
         verbose_name = "定时任务"
         verbose_name_plural = "006-定时任务"
+
+
 
 
     def __str__(self):
