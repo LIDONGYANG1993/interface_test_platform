@@ -53,6 +53,8 @@ class publicReport:
     @staticmethod
     def make_msg(msg_list):
         res_msg = ''
+        if not msg_list:
+            return res_msg
         for msg in msg_list:
             if msg is msg_list[-1]:
                 res_msg = res_msg + msg
