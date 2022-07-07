@@ -43,7 +43,7 @@ def make_report_ding(report: planReportModel):
         _case_msg = '-' * 50 + "\n\n名称：{}\n\n 原因：{}\n\n"
         case_msg = case_msg + _case_msg.format(
             case.name,
-            case.msg.split("\n")[-2]
+            case.msg.split("\n")[-1]
         )
     url = None
     if report.from_data.ding:

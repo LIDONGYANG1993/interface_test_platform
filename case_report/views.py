@@ -27,13 +27,14 @@ def get_report(request):
 
 
 def run_and_report(request):
-    result = response.result
+    resp = response()
+    result = resp.result
     request: django.http.request.HttpRequest
     data = request.GET
     data_id = data.get("data_id", None)
     ding = data.get("ding", None)
     if not data_id:
-        return JsonResponse(response.params_error)
+        return JsonResponse(resp.params_error)
     if ding == "1": ding = True
     else:ding = False
     threading.Thread(target=run_plan_report_ding, args=[data_id,ding]).start()
