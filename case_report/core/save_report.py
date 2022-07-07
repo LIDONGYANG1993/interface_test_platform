@@ -139,11 +139,11 @@ class variableReport(publicReport):
 
 
 class defaultReport(publicReport):
-    report: defaultReportModel_0
+    report: defaultReportModel
     data: defaultData
 
     def __init__(self):
-        super().__init__(defaultData, defaultReportModel_0)
+        super().__init__(defaultData, defaultReportModel)
 
     def make_data(self):
         self.report.name = self.data.model_data.name
