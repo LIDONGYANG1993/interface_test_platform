@@ -80,7 +80,7 @@ class extractorReportModel(publicModel):
     name = models.CharField(extractorReplace[extractorFiler.name], max_length=20, default="CODE", blank=True)
     value = models.CharField(extractorReplace[extractorFiler.value], max_length=255, default="code", blank=True)
     condition = models.CharField(extractorReplace[extractorFiler.condition], max_length=50, default="", blank=True)
-    result = models.CharField(max_length=255, default="", blank=True)
+    result = models.CharField(max_length=255, default="", blank=True, null=True)
 
 class assertsReportModel(publicReportModel):
     from_data = models.ForeignKey(assertsModel, verbose_name="源验证器", default=None, blank=True, on_delete=models.SET_NULL, null=True)
@@ -93,7 +93,7 @@ class assertsReportModel(publicReportModel):
     func = models.CharField(assertsReplace[assertsFiler.assertMethod], max_length=5,
                             default=publicModel.funcChoices.EQL, choices=publicModel.funcChoices.choices, blank=True)
     name_another = models.CharField(assertsReplace[assertsFiler.value2], max_length=20, default=0, blank=True)
-    result = models.CharField(max_length=100, default="", blank=True)
+    result = models.CharField(max_length=100, default="", blank=True, null=True)
 
     def __str__(self):
         return "{} {} {}".format(self.name, self.func, self.name_another)
@@ -107,7 +107,7 @@ class calculaterReportModel(publicModel):
     value1 = models.CharField(calculatorReplace[calculatorFiler.Variable1], max_length=20, default="{{variable1}}",blank=True)
     func = models.CharField(calculatorReplace[calculatorFiler.calFunction], max_length=10,default=publicModel.calChoices.ADD, choices=publicModel.calChoices.choices, blank=True)
     value2 = models.CharField(calculatorReplace[calculatorFiler.Variable2], max_length=20, default=100, blank=True)
-    result = models.CharField(max_length=100,default="", blank=True)
+    result = models.CharField(max_length=100,default="", blank=True, null=True)
 
 
     def __str__(self):
