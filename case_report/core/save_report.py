@@ -52,7 +52,7 @@ class publicReport:
 
     @staticmethod
     def make_msg(msg_list):
-        res_msg = ''
+        res_msg = 'NULL'
         if not msg_list:
             return res_msg
         for msg in msg_list:
