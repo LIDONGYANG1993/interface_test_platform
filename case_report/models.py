@@ -17,7 +17,7 @@ class publicReportModel(publicModel):
 class planReportModel(publicReportModel):
     from_data = models.ForeignKey(planModel, verbose_name="源计划", default=None, blank=True, on_delete=models.SET_NULL, null=True)
     name = models.CharField(planReplace[planFiler.name], max_length=100, default=None, blank=True)
-    default = models.OneToOneField("defaultReportModel", on_delete=models.CASCADE, null=True, verbose_name=planReplace[planFiler.environment], max_length=5, default=1)
+    default = models.OneToOneField("defaultReportModel_0", on_delete=models.CASCADE, null=True, verbose_name=planReplace[planFiler.environment], max_length=5, default=1)
     pass_count = models.IntegerField(verbose_name="通过", blank=False, default=0)
     fail_count = models.IntegerField(verbose_name="失败", blank=False, default=0)
     error_count = models.IntegerField(verbose_name="异常", blank=False, default=0)
@@ -51,7 +51,7 @@ class requestInfoReportModel(publicReportModel):
     response = models.JSONField(requestInfoReplace[requestInfoFiler.response], default=dict, blank=True, null=True)
     status = models.IntegerField(default=0, blank=True, null=True)
 
-class defaultReportModel(publicModel):
+class defaultReportModel_0(publicModel):
     from_data = models.ForeignKey(defaultModel, verbose_name="源环境信息", default=None, blank=True, on_delete=models.SET_NULL, null=True)
     name = models.CharField(defaultReplace[defaultFiler.name], max_length=100, default="environment", blank=True)
     value = models.JSONField(defaultReplace[defaultFiler.value], default=dict, blank=True)
