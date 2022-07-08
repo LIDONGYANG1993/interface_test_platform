@@ -62,7 +62,7 @@ def run_plan_and_report(data_id):
 
 def add_job():
     print("start——add")
-    subprocess.Popen("{}/add_job.sh".format(BASE_DIR))
+    subprocess.Popen("/bin/sh {}/add_job.sh".format(BASE_DIR))
     print("end——add")
 
 
