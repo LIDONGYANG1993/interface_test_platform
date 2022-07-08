@@ -84,6 +84,6 @@ def update_job(request):
     save_task()
     try:
         add_job()
-    except Exception:
-        pass
+    except Exception as e:
+        print(e)
     return JsonResponse(result)
