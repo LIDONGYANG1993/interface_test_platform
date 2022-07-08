@@ -65,7 +65,6 @@ def save_task():
     t = threading.Thread(target=write_task, args=[task], )
     t.start()
     t.join()
-    time.sleep(10)
 
 
 

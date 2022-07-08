@@ -11,8 +11,6 @@ from case_plan.core.read_class import *
 from case_plan.core.tasks import BASE_DIR
 
 
-
-
 #  执行单接口
 def run_requestInfo(data_id):
     data = requestInfoData(dataId=data_id)
@@ -38,6 +36,7 @@ def run_case(data_id):
     done.run_in_case()
     return done.result_for_api()
 
+
 #  执行一整个计划
 def run_plan(data_id):
     data = planData(dataId=data_id)
@@ -60,11 +59,9 @@ def run_plan_and_report(data_id):
     reportData.get_model(report.report)
     return reportData
 
-def add_job():
-    print("start——add")
-    sub = subprocess.Popen("/bin/sh {}/add_job.sh".format(BASE_DIR))
-    print("end——add")
 
+def add_job():
+    sub = subprocess.run("/bin/sh {}/add_job.sh".format(BASE_DIR),shell=True, stdout=subprocess.PIPE,stderr=subprocess.PIPE, close_fds=True)
 
 
 if __name__ == '__main__':
